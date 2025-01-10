@@ -107,7 +107,7 @@ Special thanks to the open-source community and the Flutter team for providing i
 
 - [Flutter Documentation](https://flutter.dev/docs)
 - [Dart Language Guide](https://dart.dev/guides)
-- [Herba Plant Repository](https://github.com/deiv44/HerbaPlants)
+- [Herba Plant Repository](https://github.com/deiv44/Herbaplant)
 
 ---
 
