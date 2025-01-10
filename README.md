@@ -85,7 +85,11 @@ This project is licensed under the MIT License. See the `LICENSE` file for more 
 
 ## 🧑‍💻 Authors
 
-- **Your Name** - *Project Lead and Developer*
+- **Guerrero, Katherine U.** - *Project Lead*
+- **Ferrer, Nervin Christopher R.** - *Developer*
+- **Leones, Keilizon-Deiv D.** - *Developer*
+- **Reyes, John Mark E** - *Developer*
+
 
 For any inquiries, please contact [kede.leones.up@phinmaed.com](kede.leones.up@phinmaed.com).
 
