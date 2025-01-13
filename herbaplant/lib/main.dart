@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+<<<<<<< Updated upstream
+=======
+import 'frontend/user/Screen/Homeuser.dart';
+import 'frontend/Auth/UserSignin.dart';
+import 'frontend/user/Screen/main_navigation.dart'; // Import MainNavigation
+>>>>>>> Stashed changes
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +17,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+<<<<<<< Updated upstream
       title: 'Flutter Demo',
+=======
+      title: 'Herbal App',
+      debugShowCheckedModeBanner: false,
+>>>>>>> Stashed changes
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -31,6 +42,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+<<<<<<< Updated upstream
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -123,3 +135,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
+=======
+      // Start with UserSignin screen
+      home: UserSignin(),
+    );
+  }
+}
+>>>>>>> Stashed changes
