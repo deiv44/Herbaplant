@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'frontend/user/Screen/Homeuser.dart'; 
+import 'frontend/user/Screen/Homeuser.dart';
+import 'frontend/Auth/UserSignin.dart';
+import 'frontend/user/Screen/main_navigation.dart'; // Import MainNavigation
 
 void main() {
   runApp(const MyApp());
@@ -12,11 +14,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Herbal App',
-      debugShowCheckedModeBanner: false, 
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: const HomeUser(), 
+      // Start with UserSignin screen
+      home: UserSignin(),
     );
   }
 }
