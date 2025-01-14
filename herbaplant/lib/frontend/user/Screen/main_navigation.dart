@@ -29,10 +29,10 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex], // Display the selected screen
+      body: _screens[_selectedIndex], 
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex, // Current selected tab
-        onTap: _onItemTapped, // Handle tab selection
+        currentIndex: _selectedIndex, 
+        onTap: _onItemTapped, 
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
