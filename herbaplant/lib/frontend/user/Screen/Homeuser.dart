@@ -7,19 +7,14 @@ class HomeUser extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Herbal'),
         backgroundColor: Colors.green,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Using herbs can offer natural, plant-based solutions for various health issues and promote overall wellness.',
-              style: TextStyle(fontSize: 16.0),
-            ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 5.0),
             TextField(
               decoration: InputDecoration(
                 hintText: 'Search herbal plant',
@@ -28,6 +23,79 @@ class HomeUser extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
+            ),
+            const SizedBox(height: 15.0),
+            GridView.count(
+              crossAxisCount: 4, 
+              crossAxisSpacing: 15,
+              mainAxisSpacing: 15,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: [
+                FeatureButton(
+                  icon: Icons.health_and_safety,
+                  label: 'Diagnose',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Diagnose clicked')),
+                    );
+                  },
+                ),
+                FeatureButton(
+                  icon: Icons.camera_alt,
+                  label: 'Identify',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Identify clicked')),
+                    );
+                  },
+                ),
+                FeatureButton(
+                  icon: Icons.chat,
+                  label: 'Plant Advisor',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Plant Advisor clicked')),
+                    );
+                  },
+                ),
+                FeatureButton(
+                  icon: Icons.star,
+                  label: 'Premium',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Premium clicked')),
+                    );
+                  },
+                ),
+                FeatureButton(
+                  icon: Icons.local_florist,
+                  label: 'My Garden',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('My Garden clicked')),
+                    );
+                  },
+                ),
+                FeatureButton(
+                  icon: Icons.book,
+                  label: 'Books',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Books clicked')),
+                    );
+                  },
+                ),
+                FeatureButton(
+                  icon: Icons.notifications,
+                  label: 'Reminders',
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Reminders clicked')),
+                    );
+                  },
+                ),
+              ],
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -106,16 +174,47 @@ class HomeUser extends StatelessWidget {
   }
 
   void _handleCameraOption(BuildContext context) {
-    // Handle the camera option here
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Camera selected')),
     );
   }
 
   void _handleGalleryOption(BuildContext context) {
-    // Handle the gallery option here
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Gallery selected')),
+    );
+  }
+}
+
+class FeatureButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const FeatureButton({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(40.0), // Matches CircleAvatar's shape
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.white,
+            radius: 28,
+            child: Icon(icon, color: Colors.green),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontSize: 12)),
+        ],
+      ),
     );
   }
 }
