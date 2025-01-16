@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'UserSignin.dart'; // Update to your actual UserSignin.dart path
+import 'UserSignin.dart'; 
 
 class UserSignup extends StatelessWidget {
+  const UserSignup({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +30,7 @@ class UserSignup extends StatelessWidget {
               ),
               SizedBox(height: 10),
               Text(
-                'HERBAFIL',
+                'HERBAPLANT',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
