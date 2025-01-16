@@ -8,6 +8,7 @@ class HomeUser extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
+        title: const Text('Herbal App'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -15,7 +16,7 @@ class HomeUser extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 5.0),
-            TextField(
+            TextField(  
               decoration: InputDecoration(
                 hintText: 'Search herbal plant',
                 prefixIcon: const Icon(Icons.search),
@@ -24,78 +25,35 @@ class HomeUser extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 15.0),
-            GridView.count(
-              crossAxisCount: 4, 
-              crossAxisSpacing: 15,
-              mainAxisSpacing: 15,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                FeatureButton(
-                  icon: Icons.health_and_safety,
-                  label: 'Diagnose',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Diagnose clicked')),
+            const SizedBox(height: 20.0),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final buttonSize = 70.0; 
+                final crossAxisCount = width ~/ buttonSize; 
+                return GridView.builder(
+                  itemCount: features.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 5,
+                    mainAxisSpacing: 10,
+                  ),
+                  itemBuilder: (context, index) {
+                    final feature = features[index];
+                    return FeatureButton(
+                      icon: feature['icon'] as IconData,
+                      label: feature['label'] as String,
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('${feature['label']} clicked')),
+                        );
+                      },
                     );
                   },
-                ),
-                FeatureButton(
-                  icon: Icons.camera_alt,
-                  label: 'Identify',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Identify clicked')),
-                    );
-                  },
-                ),
-                FeatureButton(
-                  icon: Icons.chat,
-                  label: 'Plant Advisor',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Plant Advisor clicked')),
-                    );
-                  },
-                ),
-                FeatureButton(
-                  icon: Icons.star,
-                  label: 'Premium',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Premium clicked')),
-                    );
-                  },
-                ),
-                FeatureButton(
-                  icon: Icons.local_florist,
-                  label: 'My Garden',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('My Garden clicked')),
-                    );
-                  },
-                ),
-                FeatureButton(
-                  icon: Icons.book,
-                  label: 'Books',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Books clicked')),
-                    );
-                  },
-                ),
-                FeatureButton(
-                  icon: Icons.notifications,
-                  label: 'Reminders',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Reminders clicked')),
-                    );
-                  },
-                ),
-              ],
+                );
+              },
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -154,7 +112,7 @@ class HomeUser extends StatelessWidget {
                 leading: const Icon(Icons.camera_alt),
                 title: const Text('Camera'),
                 onTap: () {
-                  Navigator.pop(context); // Close the modal
+                  Navigator.pop(context);
                   _handleCameraOption(context);
                 },
               ),
@@ -162,7 +120,7 @@ class HomeUser extends StatelessWidget {
                 leading: const Icon(Icons.photo),
                 title: const Text('Gallery'),
                 onTap: () {
-                  Navigator.pop(context); // Close the modal
+                  Navigator.pop(context);
                   _handleGalleryOption(context);
                 },
               ),
@@ -202,17 +160,22 @@ class FeatureButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(40.0), // Matches CircleAvatar's shape
+      borderRadius: BorderRadius.circular(40.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircleAvatar(
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.green,
             radius: 28,
-            child: Icon(icon, color: Colors.green),
+            child: Icon(icon, color: Colors.white),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 12)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12),
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -267,3 +230,11 @@ class HerbalCard extends StatelessWidget {
     );
   }
 }
+
+const features = [
+  {'icon': Icons.health_and_safety, 'label': 'Diagnose'},
+  {'icon': Icons.camera_alt, 'label': 'Identify'},
+  {'icon': Icons.local_florist, 'label': 'My Garden'},
+  {'icon': Icons.book, 'label': 'Books'},
+  {'icon': Icons.notifications, 'label': 'Reminders'},
+];
