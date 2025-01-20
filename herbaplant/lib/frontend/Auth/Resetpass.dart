@@ -15,7 +15,7 @@ class ResetPasswordScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         title: Center(
           child: Image.asset(
-            'assets/logo.png', // Replace with your logo path
+            'assets/logo.png',
             height: 50,
           ),
         ),
@@ -52,7 +52,7 @@ class ResetPasswordScreen extends StatelessWidget {
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.visibility_off),
-                  onPressed: () {}, // Add functionality to toggle password visibility
+                  onPressed: () {},
                 ),
               ),
             ),
@@ -68,14 +68,13 @@ class ResetPasswordScreen extends StatelessWidget {
                 prefixIcon: const Icon(Icons.lock_outline),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.visibility_off),
-                  onPressed: () {}, // Add functionality to toggle password visibility
+                  onPressed: () {},
                 ),
               ),
             ),
             const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                // Add functionality to handle password reset
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.lightGreen,

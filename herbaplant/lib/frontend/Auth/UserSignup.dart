@@ -28,7 +28,7 @@ class UserSignup extends StatelessWidget {
                   height: 80,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 10),s
               Text(
                 'HERBAPLANT',
                 style: TextStyle(

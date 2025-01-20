@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../user/Screen/main_navigation.dart'; // Import MainNavigation screen
-import 'UserSignup.dart'; // Import UserSignup screen
+import 'UserSignup.dart'; 
+import 'Forgotpass.dart';
 
 class UserSignin extends StatefulWidget {
   const UserSignin({super.key});
@@ -128,6 +129,8 @@ class _UserSigninState extends State<UserSignin> {
                               borderSide: BorderSide(color: const Color.fromARGB(255, 0, 0, 0)),
                               borderRadius: BorderRadius.circular(10),
                             ),
+
+                            
                             focusedBorder: OutlineInputBorder(
                               borderSide: BorderSide(color: const Color.fromARGB(255, 0, 0, 0)),
                               borderRadius: BorderRadius.circular(10),
@@ -138,22 +141,23 @@ class _UserSigninState extends State<UserSignin> {
 
                         // Forgot Password Button
                         Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              // Action for Forgot Password
-                              print("Forgot Password button pressed");
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Text(
-                              'Forgot Password?',
-                              style: TextStyle(color: Colors.green, fontSize: 14),
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                                );
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                              ),
+                              child: const Text(
+                                'Forgot Password?',
+                                style: TextStyle(color: Colors.green, fontSize: 14),
+                              ),
                             ),
                           ),
-                        ),
-
                         // Login Button
                         ElevatedButton(
                           onPressed: () {
