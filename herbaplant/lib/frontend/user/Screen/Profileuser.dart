@@ -9,17 +9,25 @@ class ProfileUserScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.green,
         elevation: 0,
+        title: const Text('Profile', style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.group, color: Colors.white),
+            icon: const Icon(Icons.settings, color: Colors.white),
           ),
         ],
       ),
       body: Column(
         children: [
+          // Profile Header Section
           Container(
-            color: Colors.green,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green, Colors.lightGreen],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
@@ -31,57 +39,108 @@ class ProfileUserScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 const Text(
                   'Keilizon Matthew T. Centino',
-                  style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const Text(
-                  'herbalist user',
+                  'Herbalist User',
                   style: TextStyle(fontSize: 16, color: Colors.white70),
                 ),
               ],
             ),
           ),
+
+          // Main Content Section
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16.0),
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: ListView(
                 children: [
-                  const Text(
-                    'History',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  // Account Settings Section
+                  const SectionHeader(title: 'Account Settings'),
+                  ListTile(
+                    leading: const Icon(Icons.email, color: Colors.green),
+                    title: const Text('Email Address'),
+                    subtitle: const Text('keilizon@example.com'),
+                    trailing: const Icon(Icons.edit, color: Colors.grey),
+                    onTap: () {},
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Recent Activity',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  ListTile(
+                    leading: const Icon(Icons.lock, color: Colors.green),
+                    title: const Text('Change Password'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {},
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        HerbalCard(
-                          plantName: 'Akapulko (Cassia alata)',
-                          description:
-                              'Commonly used for fungal infections like ringworm and athlete\'s foot.',
-                          status: 'Approved by doh',
-                          imageUrl: 'https://via.placeholder.com/150', // Replace with actual image
+
+                  const SizedBox(height: 20),
+
+                  // Preferences Section
+                  const SectionHeader(title: 'Preferences'),
+                  SwitchListTile(
+                    activeColor: Colors.green,
+                    title: const Text('Dark Mode'),
+                    value: false,
+                    onChanged: (bool value) {},
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.notifications, color: Colors.green),
+                    title: const Text('Notifications'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {},
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  // Logout Section
+                  Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 50,
+                          vertical: 15,
                         ),
-                        const SizedBox(height: 16),
-                        HerbalCard(
-                          plantName: 'Lagundi (Vitex negundo)',
-                          description:
-                              'Used for cough, asthma, and other respiratory issues.',
-                          status: 'Approved by doh',
-                          imageUrl: 'https://via.placeholder.com/150', // Replace with actual image
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                      ),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Confirm Logout'),
+                              content: const Text('Are you sure you want to log out?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close dialog
+                                  },
+                                  child: const Text('Cancel', style: TextStyle(color: Colors.green)),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close dialog
+                                    Navigator.pop(context); // Navigate back to the previous screen
+                                  },
+                                  child: const Text('Logout', style: TextStyle(color: Colors.red)),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: const Text('Logout', style: TextStyle(fontSize: 16)),
                     ),
                   ),
                 ],
@@ -94,71 +153,22 @@ class ProfileUserScreen extends StatelessWidget {
   }
 }
 
-class HerbalCard extends StatelessWidget {
-  final String plantName;
-  final String description;
-  final String status;
-  final String imageUrl;
+class SectionHeader extends StatelessWidget {
+  final String title;
 
-  const HerbalCard({
-    Key? key,
-    required this.plantName,
-    required this.description,
-    required this.status,
-    required this.imageUrl,
-  }) : super(key: key);
+  const SectionHeader({Key? key, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              bottomLeft: Radius.circular(10),
-            ),
-            child: Image.network(
-              imageUrl,
-              width: 100,
-              height: 100,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    plantName,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: const TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.green, size: 18),
-                      const SizedBox(width: 4),
-                      Text(
-                        status,
-                        style: const TextStyle(fontSize: 14, color: Colors.green),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
       ),
     );
   }
