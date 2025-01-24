@@ -35,7 +35,7 @@ class _UserSignupState extends State<UserSignup> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 60),
+                const SizedBox(height: 50),
                 // Logo Section
                 CircleAvatar(
                   radius: 60,
@@ -45,15 +45,7 @@ class _UserSignupState extends State<UserSignup> {
                     height: 80,
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  'HERBAPLANT',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
-                ),
+              
                 const SizedBox(height: 30),
 
                 // Sign Up Form
