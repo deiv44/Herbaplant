@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../Auth/UserSignin.dart';
+
+// Adjust the path as necessary
 
 class ProfileUserScreen extends StatelessWidget {
   const ProfileUserScreen({super.key});
@@ -7,147 +10,181 @@ class ProfileUserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        title: const Text('Profile', style: TextStyle(color: Colors.black)),
+        centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.settings, color: Colors.white),
+            icon: const Icon(Icons.settings, color: Colors.black),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Profile Header Section
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.green, Colors.lightGreen],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 50, color: Colors.green),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Keilizon Matthew T. Centino',
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Herbalist User',
-                  style: TextStyle(fontSize: 16, color: Colors.white70),
-                ),
-              ],
-            ),
-          ),
-
-          // Main Content Section
-          Expanded(
-            child: Container(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Profile Header Section
+            Padding(
               padding: const EdgeInsets.all(16.0),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              child: ListView(
+              child: Column(
                 children: [
-                  // Account Settings Section
-                  const SectionHeader(title: 'Account Settings'),
-                  ListTile(
-                    leading: const Icon(Icons.email, color: Colors.green),
-                    title: const Text('Email Address'),
-                    subtitle: const Text('keilizon@example.com'),
-                    trailing: const Icon(Icons.edit, color: Colors.grey),
-                    onTap: () {},
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.green.shade100,
+                    child:
+                        const Icon(Icons.person, size: 60, color: Colors.green),
                   ),
-                  ListTile(
-                    leading: const Icon(Icons.lock, color: Colors.green),
-                    title: const Text('Change Password'),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {},
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Preferences Section
-                  const SectionHeader(title: 'Preferences'),
-                  SwitchListTile(
-                    activeColor: Colors.green,
-                    title: const Text('Dark Mode'),
-                    value: false,
-                    onChanged: (bool value) {},
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.notifications, color: Colors.green),
-                    title: const Text('Notifications'),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {},
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Logout Section
-                  Center(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 50,
-                          vertical: 15,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Confirm Logout'),
-                              content: const Text('Are you sure you want to log out?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(); // Close dialog
-                                  },
-                                  child: const Text('Cancel', style: TextStyle(color: Colors.green)),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(); // Close dialog
-                                    Navigator.pop(context); // Navigate back to the previous screen
-                                  },
-                                  child: const Text('Logout', style: TextStyle(color: Colors.red)),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: const Text('Logout', style: TextStyle(fontSize: 16)),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Coffeestories',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'mark.brock@icloud.com',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: const Text('Edit profile',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+
+            const Divider(height: 1, color: Colors.grey),
+
+            // Inventories Section
+            SectionHeader(title: 'Inventories'),
+            ListTile(
+              leading: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  const Icon(Icons.store, color: Colors.green),
+                  Positioned(
+                    right: -6,
+                    top: -6,
+                    child: Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Text(
+                        '2',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              title: const Text('My stores'),
+              onTap: () {},
+              trailing: const Icon(Icons.arrow_forward_ios,
+                  size: 16, color: Colors.grey),
+            ),
+            ListTile(
+              leading: const Icon(Icons.support_agent, color: Colors.green),
+              title: const Text('Support'),
+              onTap: () {},
+              trailing: const Icon(Icons.arrow_forward_ios,
+                  size: 16, color: Colors.grey),
+            ),
+
+            const Divider(height: 1, color: Colors.grey),
+
+            // Preferences Section
+            SectionHeader(title: 'Preferences'),
+            SwitchListTile(
+              activeColor: Colors.green,
+              title: const Text('Push notifications'),
+              value: true,
+              onChanged: (bool value) {},
+            ),
+            SwitchListTile(
+              activeColor: Colors.green,
+              title: const Text('Face ID'),
+              value: true,
+              onChanged: (bool value) {},
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock, color: Colors.green),
+              title: const Text('PIN Code'),
+              onTap: () {},
+              trailing: const Icon(Icons.arrow_forward_ios,
+                  size: 16, color: Colors.grey),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Logout Section
+            Center(
+              child: TextButton.icon(
+                style: TextButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  foregroundColor: Colors.red,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: const Text('Confirm Logout'),
+                        content:
+                            const Text('Are you sure you want to log out?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                            },
+                            child: const Text('Cancel',
+                                style: TextStyle(color: Colors.green)),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop(); // Close the dialog
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const UserSignin(),
+                                ),
+                              );
+                            },
+                            child: const Text('Logout',
+                                style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: const Icon(Icons.logout),
+                label: const Text('Logout'),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -161,13 +198,13 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 20,
+          fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.black87,
+          color: Colors.black54,
         ),
       ),
     );
