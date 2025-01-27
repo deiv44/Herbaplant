@@ -4,7 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'Details.dart';
 
 class HomeUser extends StatefulWidget {
-  const HomeUser({Key? key}) : super(key: key);
+  const HomeUser({super.key});
 
   @override
   _HomeUserState createState() => _HomeUserState();
@@ -81,8 +81,8 @@ class _HomeUserState extends State<HomeUser> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showOptions(context),
         tooltip: 'Scan QR Code',
-        child: const Icon(Icons.qr_code_scanner),
         backgroundColor: Colors.green,
+        child: const Icon(Icons.qr_code_scanner),
       ),
     );
   }
@@ -145,11 +145,11 @@ class HerbalCard extends StatelessWidget {
   final String imageUrl;
 
   const HerbalCard({
-    Key? key,
+    super.key,
     required this.name,
     required this.description,
     required this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

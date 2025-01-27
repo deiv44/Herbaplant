@@ -6,11 +6,11 @@ class DetailsScreen extends StatelessWidget {
   final String imageUrl;
 
   const DetailsScreen({
-    Key? key,
+    super.key,
     required this.name,
     required this.description,
     required this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

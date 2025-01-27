@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MyPlant extends StatelessWidget {
+  const MyPlant({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

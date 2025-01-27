@@ -5,6 +5,8 @@ import 'MyPlant.dart';
 import 'Profileuser.dart';
 
 class MainNavigation extends StatefulWidget {
+  const MainNavigation({super.key});
+
   @override
   _MainNavigationState createState() => _MainNavigationState();
 }
