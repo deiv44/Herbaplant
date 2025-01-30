@@ -1,256 +1,253 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'Details.dart';
+import 'package:image_picker/image_picker.dart'; // Import the image_picker package
+import 'dart:io'; // For File handling
 
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
 
   @override
-  _HomeUserState createState() => _HomeUserState();
+  State<HomeUser> createState() => _HomeUserState();
 }
 
 class _HomeUserState extends State<HomeUser> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-  File? _selectedImage;
-  final ImagePicker _picker = ImagePicker();
-
-  @override
-  Widget build(BuildContext context) {
-    final filteredHerbs = herbalPlants
-        .where((plant) =>
-            plant['name']!.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
-
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: const Text('Herbal App'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 5.0),
-            TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Search herbal plant',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredHerbs.length,
-                itemBuilder: (context, index) {
-                  final plant = filteredHerbs[index];
-                  return HerbalCard(
-                    name: plant['name']!,
-                    description: plant['description']!,
-                    imageUrl: plant['imageUrl']!,
-                  );
-                },
-              ),
-            ),
-            if (_selectedImage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Center(
-                  child: Image.file(
-                    _selectedImage!,
-                    width: 150,
-                    height: 150,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showOptions(context),
-        tooltip: 'Scan QR Code',
-        backgroundColor: Colors.green,
-        child: const Icon(Icons.qr_code_scanner),
+  String currentMessage = '';  // Variable to hold the current message
+  TextEditingController messageController = TextEditingController(); // Controller for text input
+  bool _messageSent = false;  // Variable to track if the message is sent
+  ScrollController _scrollController = ScrollController(); // Controller for scrolling
+  GlobalKey _clipButtonKey = GlobalKey();  // Key to track the position of the clip button
+  final ImagePicker _picker = ImagePicker(); // Instance of ImagePicker
+  
+  void _showInfo() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('App Info'),
+        content: const Text('This is the Herbaplant app where you can chat with the plant assistant.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }
 
-  void _showOptions(BuildContext context) {
-    showModalBottomSheet(
+  // Function to handle image selection or camera opening
+  void _selectMedia(String option) async {
+    if (option == 'image') {
+      // Pick an image from the gallery
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        setState(() {
+          currentMessage = 'Image selected: ${pickedFile.name}';  // Set the message with the selected image
+          _messageSent = true;
+        });
+      }
+    } else if (option == 'camera') {
+      // Take a photo using the camera
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
+      if (pickedFile != null) {
+        setState(() {
+          currentMessage = 'Camera image taken: ${pickedFile.name}';  // Set the message with the camera image
+          _messageSent = true;
+        });
+      }
+    }
+
+    // Scroll to the bottom after the message
+    _scrollToBottom();
+  }
+
+  // Function to scroll to the bottom of the chat when a new message is added
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
+  }
+
+  // Function to show media options above the clip button
+  void _showMediaOptions(BuildContext context) {
+    final RenderBox renderBox = _clipButtonKey.currentContext?.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero); // Get the position of the clip button
+
+    showMenu(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.camera_alt),
-                title: const Text('Camera'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _handleCameraOption();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo),
-                title: const Text('Gallery'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _handleGalleryOption();
-                },
-              ),
+      position: RelativeRect.fromLTRB(position.dx, position.dy - 80, 0, 0), // Position above the clip button
+      items: [
+        PopupMenuItem<String>(
+          value: 'image',
+          child: Row(
+            children: const [
+              Icon(Icons.image, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Select Image'),
             ],
           ),
-        );
-      },
-    );
+        ),
+        PopupMenuItem<String>(
+          value: 'camera',
+          child: Row(
+            children: const [
+              Icon(Icons.camera_alt, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Open Camera'),
+            ],
+          ),
+        ),
+      ],
+      elevation: 8.0,
+    ).then((value) {
+      if (value != null) {
+        _selectMedia(value);  // Handle image/camera selection
+      }
+    });
   }
-
-  Future<void> _handleCameraOption() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _handleGalleryOption() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
-    }
-  }
-}
-
-class HerbalCard extends StatelessWidget {
-  final String name;
-  final String description;
-  final String imageUrl;
-
-  const HerbalCard({
-    super.key,
-    required this.name,
-    required this.description,
-    required this.imageUrl,
-  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DetailsScreen(
-              name: name,
-              description: description,
-              imageUrl: imageUrl,
-            ),
+    return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 225, 255, 219),
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+        elevation: 0,
+        centerTitle: true,
+        title: const Text(
+          'Herbaplant',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
         ),
-        elevation: 4,
-        margin: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.greenAccent[400],
-            borderRadius: BorderRadius.circular(12.0),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info, color: Colors.white),
+            onPressed: _showInfo, // Call the function when clicked
           ),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.horizontal(
-                  left: Radius.circular(12.0),
-                ),
-                child: Image.asset(
-                  imageUrl,
-                  width: 140,
-                  height: 110,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      body: Column(
+        children: [
+          // Display greeting text if message is not sent
+          if (!_messageSent)
+            Expanded(
+              child: Center(
+                child: RichText(
+                  text: const TextSpan(
                     children: [
-                      Text(
-                        name,
-                        style: const TextStyle(
-                          fontSize: 18.0,
+                      TextSpan(
+                        text: 'Hello, ',
+                        style: TextStyle(
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.blue,
                         ),
                       ),
-                      const SizedBox(height: 8.0),
-                      Text(
-                        description,
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          color: Colors.white,
+                      TextSpan(
+                        text: 'Herbaplant User',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.pink,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
               ),
-            ],
+            ),
+          // Chat message section showing the current message
+          Expanded(
+            child: ListView(
+              controller: _scrollController,  // Attach the scroll controller
+              children: [
+                if (currentMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Align(
+                      alignment: Alignment.center, // Center the message text
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          currentMessage,
+                          style: const TextStyle(color: Colors.black, fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
-        ),
+          // Chat input and send button
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                // Clip Icon Button on the left side
+                IconButton(
+                  key: _clipButtonKey,  // Attach the key to track the position
+                  icon: const Icon(Icons.attach_file, color: Colors.green),
+                  onPressed: () {
+                    _showMediaOptions(context);  // Show media options when clicked
+                  },
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextField(
+                    controller: messageController,  // Controller to manage the input
+                    decoration: InputDecoration(
+                      hintText: 'Type your message...',
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      filled: true,
+                      fillColor: Colors.grey[200],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () {
+                    if (messageController.text.isNotEmpty) {
+                      setState(() {
+                        currentMessage = messageController.text;  // Set the current message as the new one
+                        _messageSent = true;  // Hide the greeting when the message is sent
+                      });
+                      messageController.clear();  // Clear the input field
+                      _scrollToBottom();  // Scroll to the bottom after adding a new message
+                    }
+                  },
+                  icon: const Icon(
+                    Icons.send,
+                    color: Colors.green,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-
-const herbalPlants = [
-  {
-    'name': 'Ginger',
-    'description': 'Commonly used to relieve nausea, improve digestion...',
-    'imageUrl': 'assets/image/Logo.png',
-  },
-  {
-    'name': 'Lagundi',
-    'description': 'Used for cough, asthma, and other respiratory issues.',
-    'imageUrl': 'assets/image/Logo.png',
-  },
-  {
-    'name': 'Sambong',
-    'description': 'Known for treating kidney stones and as a diuretic.',
-    'imageUrl': 'assets/image/Logo.png',
-  },
-  {
-    'name': 'Tsaang Gubat',
-    'description': 'Used for treating stomach pain and diarrhea.',
-    'imageUrl': 'assets/image/Logo.png',
-  },
-  {
-    'name': 'Akapulko',
-    'description': 'Commonly used for fungal infections like ringworm.',
-    'imageUrl': 'assets/image/Logo.png',
-  },
-];
+void main() {
+  runApp(const MaterialApp(
+    home: HomeUser(),
+    debugShowCheckedModeBanner: false,
+  ));
+}

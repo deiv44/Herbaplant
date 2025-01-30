@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Homeuser.dart';
 import 'Diagnose.dart';
-import 'MyPlant.dart';
+import 'History.dart';
 import 'Profileuser.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -18,7 +18,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = [
     HomeUser(),
     Diagnose(),
-    MyPlant(),
+    History(),
     ProfileUserScreen(),
   ];
 
@@ -31,12 +31,13 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex], 
+      body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: Colors.green, // Set the color for the selected icon
-        unselectedItemColor: Colors.grey, // Set the color for the unselected icons
+        unselectedItemColor:
+            Colors.grey, // Set the color for the unselected icons
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -48,7 +49,7 @@ class _MainNavigationState extends State<MainNavigation> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.local_florist),
-            label: 'My Plant',
+            label: 'History',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
