@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Herbaplant" type="FlutterRunConfigurationType" factoryName="Flutter">
+    <option name="filePath" value="$PROJECT_DIR$/herbaplant/lib/main.dart" />
+    <method v="2" />
+  </configuration>
+</component>
