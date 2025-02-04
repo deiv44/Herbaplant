@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
-class History extends StatelessWidget {
+class History extends StatefulWidget {
   const History({super.key});
+
+  @override
+  _HistoryState createState() => _HistoryState();
+}
+
+class _HistoryState extends State<History> {
+  List<String> plantHistory = []; // Initially empty, add data dynamically
 
   @override
   Widget build(BuildContext context) {
@@ -13,37 +21,52 @@ class History extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center, // Centers the column
           children: [
-            Text(
-              'Your Plant History:',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+            // Search Bar
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Search plant history...",
+                prefixIcon: Icon(Icons.search, color: Colors.green),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              onChanged: (query) {
+                // Implement search functionality here
+              },
             ),
             SizedBox(height: 20),
+
+            // Check if history is empty
             Expanded(
-              child: ListView.builder(
-                itemCount: 5, // Replace with actual data for plant history
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      leading: Icon(Icons.history, color: Colors.green),
-                      title: Text('Plant History ${index + 1}'),
-                      subtitle: Text('Description of history for Plant ${index + 1}'),
-                      trailing: Icon(Icons.arrow_forward),
-                      onTap: () {
-                        // Navigate to DetailsScreen when tapped
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailsScreen(plantIndex: index + 1),
+              child: plantHistory.isEmpty
+                  ? Center(
+                      child: Lottie.asset(
+                        'assets/animations/historyn.json', // Ensure this file exists in assets
+                        repeat: true,
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: plantHistory.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: ListTile(
+                            leading: Icon(Icons.history, color: Colors.green),
+                            title: Text(plantHistory[index]),
+                            trailing: Icon(Icons.arrow_forward),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailsScreen(
+                                      plantName: plantHistory[index]),
+                                ),
+                              );
+                            },
                           ),
                         );
                       },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),
@@ -53,20 +76,20 @@ class History extends StatelessWidget {
 }
 
 class DetailsScreen extends StatelessWidget {
-  final int plantIndex;
+  final String plantName;
 
-  const DetailsScreen({super.key, required this.plantIndex});
+  const DetailsScreen({super.key, required this.plantName});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Plant ${plantIndex} Details'),
+        title: Text(plantName),
         backgroundColor: Colors.green,
       ),
       body: Center(
         child: Text(
-          'Details for Plant $plantIndex',
+          'Details for $plantName',
           style: TextStyle(fontSize: 22),
         ),
       ),

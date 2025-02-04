@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -86,16 +87,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   SizedBox(height: 40),
 
-                  // Illustration
+                  // Lottie Animation
                   SizedBox(
                     height: 200,
-                    child: Image.asset(
-                      'assets/illustration.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.image_not_supported,
-                            size: 100, color: Colors.grey);
-                      },
+                    child: Lottie.asset(
+                      'assets/animations/forgot.json', // Ensure this file exists in assets
+                      repeat: true,
                     ),
                   ),
                   SizedBox(height: 40),
@@ -117,24 +114,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   // Continue button
                   ElevatedButton(
                     onPressed: _isLoading ? null : _handleForgotPassword,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Increased padding
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
                       ),
-                    ),
-                    child: _isLoading
-                        ? CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            'Continue',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
+                      child: _isLoading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Padding( 
+                              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10), // Extra padding inside
+                              child: Text(
+                                'Continue',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
-                  ),
-                  SizedBox(height: 10),
+                    ),
+
 
                   // Cancel button
                   TextButton(
