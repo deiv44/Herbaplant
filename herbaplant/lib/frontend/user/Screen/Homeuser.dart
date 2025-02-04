@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart'; // Import the image_picker package
-import 'dart:io'; // For File handling
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:tflite/tflite.dart';
+import 'package:lottie/lottie.dart';
 
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
@@ -10,201 +12,224 @@ class HomeUser extends StatefulWidget {
 }
 
 class _HomeUserState extends State<HomeUser> {
-  String currentMessage = '';  // Variable to hold the current message
-  TextEditingController messageController = TextEditingController(); // Controller for text input
-  bool _messageSent = false;  // Variable to track if the message is sent
-  ScrollController _scrollController = ScrollController(); // Controller for scrolling
-  GlobalKey _clipButtonKey = GlobalKey();  // Key to track the position of the clip button
-  final ImagePicker _picker = ImagePicker(); // Instance of ImagePicker
-  
-  void _showInfo() {
-    showDialog(
+  List<Map<String, dynamic>> messages = []; // Stores chat messages
+  TextEditingController messageController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
+  final ImagePicker _picker = ImagePicker();
+
+  String? _result; // Prediction result
+  File? _image; // Selected image file
+  bool _isLoading = false; // Loading state
+  bool _hasUserInteracted = false; // Controls the visibility of welcome UI
+
+  @override
+  void initState() {
+    super.initState();
+    _loadModel();
+  }
+
+  // Load the TFLite model
+  Future<void> _loadModel() async {
+    try {
+      String? result = await Tflite.loadModel(
+        model: "assets/models/model.tflite",
+        labels: "assets/models/labels.txt",
+      );
+      print("Model loaded: $result");
+    } catch (e) {
+      print("Error loading model: $e");
+    }
+  }
+
+  // Handle media selection (camera/gallery)
+  void _selectMedia(ImageSource source) async {
+    XFile? pickedFile = await _picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      File imageFile = File(pickedFile.path);
+      setState(() {
+        _image = imageFile;
+        messages.add({'type': 'image', 'content': pickedFile.path});
+        _hasUserInteracted = true; // Hide welcome UI after selection
+      });
+
+      await _predictImage(imageFile);
+    }
+  }
+
+  // Show image source selection dialog
+  void _showImageSourceDialog() {
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('App Info'),
-        content: const Text('This is the Herbaplant app where you can chat with the plant assistant.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      builder: (context) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.camera_alt, color: Colors.green),
+            title: const Text("Take a Photo"),
+            onTap: () {
+              Navigator.pop(context);
+              _selectMedia(ImageSource.camera);
             },
-            child: const Text('Close'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.photo_library, color: Colors.green),
+            title: const Text("Choose from Gallery"),
+            onTap: () {
+              Navigator.pop(context);
+              _selectMedia(ImageSource.gallery);
+            },
           ),
         ],
       ),
     );
   }
 
-  // Function to handle image selection or camera opening
-  void _selectMedia(String option) async {
-    if (option == 'image') {
-      // Pick an image from the gallery
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  // Process and predict image
+  Future<void> _predictImage(File image) async {
+    setState(() {
+      _isLoading = true;
+      _hasUserInteracted = true; // Hide Hi, User & Lottie after interaction
+    });
 
-      if (pickedFile != null) {
-        setState(() {
-          currentMessage = 'Image selected: ${pickedFile.name}';  // Set the message with the selected image
-          _messageSent = true;
-        });
-      }
-    } else if (option == 'camera') {
-      // Take a photo using the camera
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    try {
+      var predictions = await Tflite.runModelOnImage(
+        path: image.path,
+        numResults: 5,
+        threshold: 0.5,
+      );
 
-      if (pickedFile != null) {
-        setState(() {
-          currentMessage = 'Camera image taken: ${pickedFile.name}';  // Set the message with the camera image
-          _messageSent = true;
-        });
-      }
+      setState(() {
+        if (predictions != null && predictions.isNotEmpty) {
+          _result = predictions.first['label'];
+          messages.add({'type': 'text', 'content': "Prediction: $_result"});
+        } else {
+          _result = "No match found!";
+          messages.add({'type': 'text', 'content': "Prediction: No match found!"});
+        }
+      });
+    } catch (e) {
+      print("Error during prediction: $e");
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
 
-    // Scroll to the bottom after the message
     _scrollToBottom();
   }
 
-  // Function to scroll to the bottom of the chat when a new message is added
+  // Send text message
+  void _sendMessage() {
+    if (messageController.text.isNotEmpty) {
+      setState(() {
+        messages.add({'type': 'text', 'content': messageController.text});
+        messageController.clear();
+        _hasUserInteracted = true; // Hide welcome UI after message sent
+      });
+      _scrollToBottom();
+    }
+  }
+
+  // Scroll to bottom of chat
   void _scrollToBottom() {
     Future.delayed(const Duration(milliseconds: 300), () {
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
 
-  // Function to show media options above the clip button
-  void _showMediaOptions(BuildContext context) {
-    final RenderBox renderBox = _clipButtonKey.currentContext?.findRenderObject() as RenderBox;
-    final position = renderBox.localToGlobal(Offset.zero); // Get the position of the clip button
-
-    showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(position.dx, position.dy - 80, 0, 0), // Position above the clip button
-      items: [
-        PopupMenuItem<String>(
-          value: 'image',
-          child: Row(
-            children: const [
-              Icon(Icons.image, color: Colors.black),
-              SizedBox(width: 8),
-              Text('Select Image'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'camera',
-          child: Row(
-            children: const [
-              Icon(Icons.camera_alt, color: Colors.black),
-              SizedBox(width: 8),
-              Text('Open Camera'),
-            ],
-          ),
-        ),
-      ],
-      elevation: 8.0,
-    ).then((value) {
-      if (value != null) {
-        _selectMedia(value);  // Handle image/camera selection
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 225, 255, 219),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.green,
         elevation: 0,
         centerTitle: true,
         title: const Text(
           'Herbaplant',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.info, color: Colors.white),
-            onPressed: _showInfo, // Call the function when clicked
-          ),
-        ],
       ),
       body: Column(
         children: [
-          // Display greeting text if message is not sent
-          if (!_messageSent)
-            Expanded(
-              child: Center(
-                child: RichText(
-                  text: const TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Hello, ',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      TextSpan(
-                        text: 'Herbaplant User',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.pink,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          if (_isLoading)
+            const LinearProgressIndicator(color: Colors.green),
+
+          // Show welcome message & Lottie only if user hasn't interacted
+          if (!_hasUserInteracted) ...[
+            const SizedBox(height: 20),
+            const Text(
+              "Hi, User",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
             ),
-          // Chat message section showing the current message
+            const SizedBox(height: 8),
+            const Text(
+              "Identify Herbal Plant in your local area!",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            Lottie.asset("assets/animations/scanplanta.json", width: 200, height: 200),
+            const SizedBox(height: 20),
+          ],
+
+          // Chat messages
           Expanded(
-            child: ListView(
-              controller: _scrollController,  // Attach the scroll controller
-              children: [
-                if (currentMessage.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Align(
-                      alignment: Alignment.center, // Center the message text
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          currentMessage,
-                          style: const TextStyle(color: Colors.black, fontSize: 16),
-                        ),
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                final message = messages[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      padding: message['type'] == 'text'
+                          ? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)
+                          : EdgeInsets.zero,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * 0.75,
+                      ),
+                      child: message['type'] == 'text'
+                          ? Text(
+                              message['content'],
+                              style: const TextStyle(color: Colors.black, fontSize: 16),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                File(message['content']),
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                     ),
                   ),
-              ],
+                );
+              },
             ),
           ),
-          // Chat input and send button
+
+          // Chat input section
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                // Clip Icon Button on the left side
                 IconButton(
-                  key: _clipButtonKey,  // Attach the key to track the position
                   icon: const Icon(Icons.attach_file, color: Colors.green),
-                  onPressed: () {
-                    _showMediaOptions(context);  // Show media options when clicked
-                  },
+                  onPressed: _showImageSourceDialog,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    controller: messageController,  // Controller to manage the input
+                    controller: messageController,
                     decoration: InputDecoration(
                       hintText: 'Type your message...',
                       hintStyle: const TextStyle(color: Colors.grey),
@@ -220,21 +245,8 @@ class _HomeUserState extends State<HomeUser> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  onPressed: () {
-                    if (messageController.text.isNotEmpty) {
-                      setState(() {
-                        currentMessage = messageController.text;  // Set the current message as the new one
-                        _messageSent = true;  // Hide the greeting when the message is sent
-                      });
-                      messageController.clear();  // Clear the input field
-                      _scrollToBottom();  // Scroll to the bottom after adding a new message
-                    }
-                  },
-                  icon: const Icon(
-                    Icons.send,
-                    color: Colors.green,
-                    size: 28,
-                  ),
+                  onPressed: _sendMessage,
+                  icon: const Icon(Icons.send, color: Colors.green, size: 28),
                 ),
               ],
             ),

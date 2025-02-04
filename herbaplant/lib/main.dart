@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'frontend/Auth/UserSignin.dart';
+import 'splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
       ),
-      home: UserSignin(),
+      home: SplashScreen(),
     );
   }
 }
