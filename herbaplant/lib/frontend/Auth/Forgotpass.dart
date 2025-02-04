@@ -113,7 +113,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   // Continue button
                   ElevatedButton(
-                    onPressed: _isLoading ? null : _handleForgotPassword,
+                      onPressed: _isLoading ? null : _handleForgotPassword,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
                         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40), // Increased padding
@@ -135,6 +135,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                     ),
 
+                  SizedBox(height: 10),
 
                   // Cancel button
                   TextButton(
