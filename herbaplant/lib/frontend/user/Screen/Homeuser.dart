@@ -161,7 +161,7 @@ class _HomeUserState extends State<HomeUser> {
             const SizedBox(height: 20),
             const Text(
               "Hi, User",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
             ),
             const SizedBox(height: 8),
             const Text(
