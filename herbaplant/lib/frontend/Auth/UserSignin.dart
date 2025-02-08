@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import '../user/Screen/main_navigation.dart'; // Import MainNavigation screen
+import 'package:go_router/go_router.dart';
+import '../user/Screen/onboarding.dart';
+import '../user/Screen/main_navigation.dart';
 import 'UserSignup.dart';
 import 'Forgotpass.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '/services/api_service.dart';
 
 class UserSignin extends StatefulWidget {
   const UserSignin({super.key});
@@ -12,10 +16,39 @@ class UserSignin extends StatefulWidget {
 
 class _UserSigninState extends State<UserSignin> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isLoading = false; 
+
+  //  Handle Login
+  void _handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      String? token = await ApiService.loginUser(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (token != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("token", token);
+
+        // Fetch `first_time_login` from the backend
+        bool isFirstLogin = await ApiService.checkFirstTimeLogin();
+
+        if (isFirstLogin) {
+          GoRouter.of(context).go('/onboarding'); // First-time login > Onboarding (eto ung user guide pag first time maglogin ng)
+        } else {
+          GoRouter.of(context).go('/home'); // Already logged in > Home
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Login failed! Please check your credentials.")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,11 +83,13 @@ class _UserSigninState extends State<UserSignin> {
                     children: [
                       // Logo Section
                       CircleAvatar(
-                        radius: 80,
+                        radius: 100,
                         backgroundColor: Colors.white,
                         child: Image.asset(
-                          'assets/image/Logo.png',
-                          height: 100,
+                          'assets/image/logo-new.png',
+                          height: 140,
+                          width: 140,
+                          fit: BoxFit.contain,
                         ),
                       ),
                       const SizedBox(height: 30),
@@ -97,29 +132,26 @@ class _UserSigninState extends State<UserSignin> {
                             ),
                             const SizedBox(height: 15),
 
-                            // Username Field
+
+                            // Email Field
                             TextFormField(
-                              controller: _usernameController,
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
-                                prefixIcon:
-                                    const Icon(Icons.person, color: Colors.green),
-                                labelText: 'Username',
-                                labelStyle:
-                                    const TextStyle(color: Colors.black),
+                                prefixIcon: const Icon(Icons.email, color: Colors.green),
+                                labelText: 'Email',
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.black),
+                                  borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.black),
+                                  borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
                               validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter your username';
+                                if (value == null || value.isEmpty || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                  return 'Please enter a valid email';
                                 }
                                 return null;
                               },
@@ -195,30 +227,20 @@ class _UserSigninState extends State<UserSignin> {
 
                             // Login Button
                             ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            MainNavigation()),
-                                  );
-                                }
-                              },
+                              onPressed: _handleLogin,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
                               child: const Text(
                                 'Login',
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.white),
+                                style: TextStyle(fontSize: 16, color: Colors.white),
                               ),
                             ),
+
                             const SizedBox(height: 18),
 
                             Row(
