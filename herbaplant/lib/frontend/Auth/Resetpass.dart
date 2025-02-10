@@ -1,102 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '/services/api_service.dart';
 
-class ResetPasswordScreen extends StatelessWidget {
-  final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+class ResetPasswordScreen extends StatefulWidget {
+  final String token;
 
-  ResetPasswordScreen({super.key});
+  const ResetPasswordScreen({super.key, required this.token});
+
+  @override
+  _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
+}
+
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
+
+void _handleResetPassword() async {
+  final newPassword = _newPasswordController.text.trim();
+  final confirmPassword = _confirmPasswordController.text.trim();
+
+  if (newPassword.isEmpty || confirmPassword.isEmpty) {
+    _showSnackbar("All fields are required!", Colors.red, Icons.warning);
+    return;
+  }
+  if (newPassword.length < 6) {
+    _showSnackbar("Password must be at least 6 characters!", Colors.red, Icons.warning);
+    return;
+  }
+  if (newPassword != confirmPassword) {
+    _showSnackbar("Passwords do not match!", Colors.red, Icons.warning);
+    return;
+  }
+
+  setState(() => _isLoading = true);
+  String response = await ApiService.resetPassword(widget.token, newPassword);
+  setState(() => _isLoading = false);
+
+  if (response.toLowerCase().contains("successful")) {
+    GoRouter.of(context).go('/login');
+  } else {
+    _showSnackbar("Error: $response", Colors.red, Icons.error);
+  }
+}
+
+
+  void _showSnackbar(String message, Color bgColor, IconData icon) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 10),
+            Expanded(child: Text(message, style: const TextStyle(color: Colors.white))),
+          ],
+        ),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: Center(
-          child: Image.asset(
-            'assets/logo.png',
-            height: 50,
-          ),
-        ),
-      ),
+      appBar: AppBar(title: const Text("Reset Password")),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'Reset Your Password',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'The password must be different than before',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 30),
             TextField(
-              controller: newPasswordController,
+              controller: _newPasswordController,
               obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'New password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.visibility_off),
-                  onPressed: () {},
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: confirmPasswordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Confirm password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.visibility_off),
-                  onPressed: () {},
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightGreen,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-              ),
-              child: const Text(
-                'Continue',
-                style: TextStyle(fontSize: 16),
-              ),
+              decoration: const InputDecoration(labelText: "New Password"),
             ),
             const SizedBox(height: 10),
-            TextButton(
-              onPressed: () {
-                // Add functionality to cancel the operation
-              },
-              child: const Text(
-                'Cancel',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
+            TextField(
+              controller: _confirmPasswordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: "Confirm Password"),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _isLoading ? null : _handleResetPassword,
+              child: _isLoading ? const CircularProgressIndicator() : const Text("Reset Password"),
             ),
           ],
         ),

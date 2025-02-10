@@ -30,14 +30,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  tflite_flutter: ^0.11.0
+  shared_preferences: ^2.2.2
+  introduction_screen: ^3.1.4
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   lottie: ^3.3.1
   http: ^1.3.0
-  tflite_flutter: ^0.11.0
-  tflite: ^1.1.2
+  go_router: ^14.7.2
+  uni_links: ^0.5.1
+  
+  
+
 
 
 dev_dependencies:
@@ -70,6 +77,10 @@ flutter:
       - assets/animations/
       - assets/models/model_unquant.tflite
       - assets/models/labels.txt
+      - assets/image/circle-new.png
+      - assets/image/logo-new.png
+      - assets/image/intro_chat.png
+      - assets/animations/typing.gif
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -91,17 +102,24 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
+
+    - family: Raleway
+      fonts:
+        - asset: assets/fonts/Raleway-Regular.ttf
+        - asset: assets/fonts/Raleway-Bold.ttf
+          weight: 700
+
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
