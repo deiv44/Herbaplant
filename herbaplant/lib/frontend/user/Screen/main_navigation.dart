@@ -17,7 +17,7 @@ class _MainNavigationState extends State<MainNavigation> {
   // List of screens
   final List<Widget> _screens = [
     HomeUser(),
-    Diagnose(),
+    // Diagnose(),
     History(),
     ProfileUserScreen(),
   ];
@@ -35,9 +35,9 @@ class _MainNavigationState extends State<MainNavigation> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.green, // Set the color for the selected icon
+        selectedItemColor: Colors.green,  // Selected icon
         unselectedItemColor:
-            Colors.grey, // Set the color for the unselected icons
+            Colors.grey, // Unselected icon
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

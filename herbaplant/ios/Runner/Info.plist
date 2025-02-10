@@ -49,6 +49,16 @@
 	<string>We need access to your camera</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>herbaplant</string>
+			</array>
+		</dict>
+	</array>
+
 
 </dict>
 </plist>

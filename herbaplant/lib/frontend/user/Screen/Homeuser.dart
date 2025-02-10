@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:tflite/tflite.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '/services/api_service.dart';
+import 'package:herbaplant/frontend/Auth/UserSignin.dart';
 
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
@@ -12,7 +15,7 @@ class HomeUser extends StatefulWidget {
 }
 
 class _HomeUserState extends State<HomeUser> {
-  List<Map<String, dynamic>> messages = []; // Stores chat messages
+  List<Map<String, dynamic>> messages = []; //chat messages, not yet done!!!
   TextEditingController messageController = TextEditingController();
   ScrollController _scrollController = ScrollController();
   final ImagePicker _picker = ImagePicker();
@@ -22,40 +25,39 @@ class _HomeUserState extends State<HomeUser> {
   bool _isLoading = false; // Loading state
   bool _hasUserInteracted = false; // Controls the visibility of welcome UI
 
-  @override
-  void initState() {
-    super.initState();
-    _loadModel();
-  }
+  // Logout function
+  void _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token");
+    
+    debugPrint("🔓 Token cleared."); // debugging
 
-  // Load the TFLite model
-  Future<void> _loadModel() async {
-    try {
-      String? result = await Tflite.loadModel(
-        model: "assets/models/model.tflite",
-        labels: "assets/models/labels.txt",
-      );
-      print("Model loaded: $result");
-    } catch (e) {
-      print("Error loading model: $e");
+    if (mounted) {
+      GoRouter.of(context).go('/login');
     }
   }
+
 
   // Handle media selection (camera/gallery)
   void _selectMedia(ImageSource source) async {
-    XFile? pickedFile = await _picker.pickImage(source: source);
+  XFile? pickedFile = await _picker.pickImage(source: source);
 
     if (pickedFile != null) {
       File imageFile = File(pickedFile.path);
+
+      print("📸 Selected Image Path: ${imageFile.path}");  // Debugging log
+
       setState(() {
         _image = imageFile;
         messages.add({'type': 'image', 'content': pickedFile.path});
-        _hasUserInteracted = true; // Hide welcome UI after selection
+        _hasUserInteracted = true;
       });
 
+      await Future.delayed(Duration(milliseconds: 500));
       await _predictImage(imageFile);
     }
   }
+
 
   // Show image source selection dialog
   void _showImageSourceDialog() {
@@ -85,31 +87,58 @@ class _HomeUserState extends State<HomeUser> {
     );
   }
 
-  // Process and predict image
+  // Send image to backend and get prediction
   Future<void> _predictImage(File image) async {
     setState(() {
       _isLoading = true;
-      _hasUserInteracted = true; // Hide Hi, User & Lottie after interaction
+      _hasUserInteracted = true;
     });
 
     try {
-      var predictions = await Tflite.runModelOnImage(
-        path: image.path,
-        numResults: 5,
-        threshold: 0.5,
-      );
+      Map<String, dynamic>? result = await ApiService.predictPlant(image);
+
+      if (result == null || result.containsKey("error")) {
+        setState(() {
+          messages.add({'type': 'text', 'content': "Prediction failed: ${result?['error'] ?? 'Unknown error'}"});
+        });
+        return;
+      }
+
+      // Extract plant details safely
+      String plantName = result['plant'] ?? "Unknown Plant";
+      String family = result['family'] ?? "Unknown Family";
+      String usage = result['usage'] ?? "No usage information available.";
+      String benefits = result['benefits'] ?? "No benefits listed.";
+      String confidence = result['confidence'] ?? "0%";
+
+      // Create a single message string instead of separate messages
+      String formattedMessage = """
+        Detected Plant:  
+        $plantName  
+
+        Family:
+        $family  
+
+        Usage:  
+        $usage  
+
+        Benefits:  
+        $benefits  
+
+        Confidence: 
+        $confidence  
+        """;
 
       setState(() {
-        if (predictions != null && predictions.isNotEmpty) {
-          _result = predictions.first['label'];
-          messages.add({'type': 'text', 'content': "Prediction: $_result"});
-        } else {
-          _result = "No match found!";
-          messages.add({'type': 'text', 'content': "Prediction: No match found!"});
-        }
+        _result = plantName;
+        messages.add({'type': 'text', 'content': formattedMessage});
       });
     } catch (e) {
-      print("Error during prediction: $e");
+      print("⚠️ Error during prediction: $e");
+
+      setState(() {
+        messages.add({'type': 'text', 'content': " Prediction failed. Try again."});
+      });
     } finally {
       setState(() {
         _isLoading = false;
@@ -125,7 +154,7 @@ class _HomeUserState extends State<HomeUser> {
       setState(() {
         messages.add({'type': 'text', 'content': messageController.text});
         messageController.clear();
-        _hasUserInteracted = true; // Hide welcome UI after message sent
+        _hasUserInteracted = true; 
       });
       _scrollToBottom();
     }
@@ -142,14 +171,20 @@ class _HomeUserState extends State<HomeUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.green,
+        appBar: AppBar(
+        backgroundColor: Colors.green.shade700,
         elevation: 0,
         centerTitle: true,
         title: const Text(
           'Herbaplant',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            onPressed: _logout, 
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -159,10 +194,10 @@ class _HomeUserState extends State<HomeUser> {
           // Show welcome message & Lottie only if user hasn't interacted
           if (!_hasUserInteracted) ...[
             const SizedBox(height: 20),
-            const Text(
-              "Hi, User",
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
-            ),
+            // const Text(
+            //   "Hi, User",
+            //   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
+            // ),
             const SizedBox(height: 8),
             const Text(
               "Identify Herbal Plant in your local area!",
@@ -183,7 +218,7 @@ class _HomeUserState extends State<HomeUser> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                   child: Align(
-                    alignment: Alignment.center,
+                    alignment: Alignment.centerRight,
                     child: Container(
                       padding: message['type'] == 'text'
                           ? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)

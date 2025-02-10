@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-import 'frontend/Auth/UserSignin.dart'; // Replace with your actual main screen
+import 'frontend/Auth/UserSignin.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'frontend/user/Screen/onboarding.dart';
+import 'frontend/user/Screen/main_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -18,13 +24,25 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     _controller = AnimationController(vsync: this);
 
     // Play Lottie animation and navigate after 2 seconds
-    Future.delayed(Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        _createSlideTransition(UserSignin()), // Slide left transition
-      );
-    });
+    Future.delayed(const Duration(seconds: 2), _navigateToNextScreen);
   }
+
+  /// **Navigation Logic**
+  Future<void> _navigateToNextScreen() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isFirstLogin = prefs.getBool("first_login") ?? true;
+    String? token = prefs.getString("token");
+
+    if (token != null && isFirstLogin) {
+      await prefs.setBool("first_login", false);
+      if (mounted) context.go('/onboarding');
+    } else if (token != null) {
+      if (mounted) context.go('/home');
+    } else {
+      if (mounted) context.go('/login');
+    }
+  }
+
 
   @override
   void dispose() {
@@ -39,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
       body: Stack(
         fit: StackFit.expand, // Ensures full-screen layout
         children: [
-          /// **Full-Screen Lottie Background**
+          // Full-Screen Lottie Background
           Positioned.fill(
             child: Lottie.asset(
               'assets/animations/splash.json',
@@ -53,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             ),
           ),
 
-          /// **Centered Logo**
+          // Centered Logo
           Center(
             child: Image.asset(
               'assets/image/logonobg.png',
@@ -65,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     );
   }
 
-  /// **Custom Left Slide Transition**
+  // Custom Left Slide Transition
   PageRouteBuilder _createSlideTransition(Widget page) {
     return PageRouteBuilder(
       transitionDuration: Duration(milliseconds: 3000), // Slide duration
