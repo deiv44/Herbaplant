@@ -121,6 +121,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
+                    
                     onPressed: _isLoading ? null : _handleForgotPassword,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
@@ -137,6 +138,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             ),
                           ),
                   ),
+
+
                   TextButton(
                     onPressed: () => GoRouter.of(context).go('/login'),
                     child: Text(

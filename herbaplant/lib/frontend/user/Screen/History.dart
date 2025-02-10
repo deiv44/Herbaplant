@@ -58,8 +58,7 @@ class _HistoryState extends State<History> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => DetailsScreen(
-                                      plantName: plantHistory[index]),
+                                  builder: (context) => DetailsScreen(plantName: plantHistory[index]),
                                 ),
                               );
                             },

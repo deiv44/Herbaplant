@@ -193,11 +193,12 @@ class _HomeUserState extends State<HomeUser> {
 
           // Show welcome message & Lottie only if user hasn't interacted
           if (!_hasUserInteracted) ...[
-            const SizedBox(height: 20),
+            
             // const Text(
             //   "Hi, User",
             //   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
             // ),
+            
             const SizedBox(height: 8),
             const Text(
               "Identify Herbal Plant in your local area!",
