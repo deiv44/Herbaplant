@@ -83,7 +83,7 @@ class _UserSignupState extends State<UserSignup> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/background.jpg'),
+            image: AssetImage('assets/image/bgpalnt.jpg'),
             fit: BoxFit.cover,
           ),
         ),
