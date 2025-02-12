@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'Homeuser.dart';
-import 'Diagnose.dart';
+import 'Identify.dart';
 import 'History.dart';
 import 'Profileuser.dart';
 
@@ -8,21 +8,26 @@ class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
 
   @override
-  _MainNavigationState createState() => _MainNavigationState();
+  MainNavigationState createState() => MainNavigationState();
 }
 
-class _MainNavigationState extends State<MainNavigation> {
+class MainNavigationState extends State<MainNavigation> {
   int _selectedIndex = 0;
 
   // List of screens
   final List<Widget> _screens = [
     HomeUser(),
-    // Diagnose(),
+    Identify(),
     History(),
     ProfileUserScreen(),
   ];
 
   void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+  void setSelectedIndex(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -35,25 +40,24 @@ class _MainNavigationState extends State<MainNavigation> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: Colors.green,  // Selected icon
-        unselectedItemColor:
-            Colors.grey, // Unselected icon
+        selectedItemColor: Colors.green, // Selected icon
+        unselectedItemColor: Colors.grey, // Unselected icon
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.health_and_safety),
-            label: 'Diagnose',
+            icon: Icon(Icons.camera_alt_rounded),
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.local_florist),
-            label: 'History',
+            label: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: '',
           ),
         ],
       ),

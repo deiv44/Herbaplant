@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../Auth/UserSignin.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '/frontend/Auth/UserSignin.dart';
 
 class ProfileUserScreen extends StatefulWidget {
   const ProfileUserScreen({super.key});
@@ -10,7 +12,16 @@ class ProfileUserScreen extends StatefulWidget {
 
 class _ProfileUserScreenState extends State<ProfileUserScreen> {
   bool _pushNotifications = true;
-  bool _darkMode = false;
+
+  // Logout function to clear the token and navigate to login
+  void _logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token");
+    debugPrint("🔓 Token cleared.");
+    if (mounted) {
+      GoRouter.of(context).go('/login');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,28 +69,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
 
           const Divider(height: 20, color: Colors.grey),
 
-          // Security Section
-          const _SectionHeader(title: 'Security'),
-          ListTile(
-            leading: const Icon(Icons.fingerprint, color: Colors.green),
-            title: const Text('Face ID'),
-            onTap: () {
-              // Navigate to Face ID settings or show dialog
-            },
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-          ),
-          ListTile(
-            leading: const Icon(Icons.lock_outline, color: Colors.green),
-            title: const Text('Set PIN Code'),
-            onTap: () {
-              // Navigate to set PIN code screen or show dialog
-            },
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-          ),
-
-          const Divider(height: 20, color: Colors.grey),
-
-          // App Preferences Section (Switch toggles now)
+          // App Preferences Section
           const _SectionHeader(title: 'App Preferences'),
           SwitchListTile(
             activeColor: Colors.green,
@@ -91,20 +81,10 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
               });
             },
           ),
-          SwitchListTile(
-            activeColor: Colors.green,
-            title: const Text('Dark Mode'),
-            value: _darkMode,
-            onChanged: (bool value) {
-              setState(() {
-                _darkMode = value;
-              });
-            },
-          ),
 
           const Divider(height: 20, color: Colors.grey),
 
-          // Logout Section (Updated)
+          // Logout Section (Fixed)
           Center(
             child: TextButton.icon(
               style: TextButton.styleFrom(
@@ -128,12 +108,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
                         TextButton(
                           onPressed: () {
                             Navigator.of(context).pop(); // Close the dialog
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const UserSignin(),
-                              ),
-                            );
+                            _logout(); // Call logout function
                           },
                           child: const Text('Logout', style: TextStyle(color: Colors.red)),
                         ),
