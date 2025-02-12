@@ -10,11 +10,11 @@ class HomeUser extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: const Color.fromARGB(255, 42, 143, 45),
         elevation: 0,
         centerTitle: false,
         title: const Text(
-          'Herbalbal',
+          'HerbalPlant',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
@@ -23,7 +23,7 @@ class HomeUser extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(15.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -60,8 +60,9 @@ class HomeUser extends StatelessWidget {
                       width: 250,
                       margin: const EdgeInsets.only(right: 10),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade100,
+                        color: const Color.fromARGB(255, 243, 255, 247),
                         borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color.fromARGB(255, 0, 0, 0), width: 1),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -79,7 +80,7 @@ class HomeUser extends StatelessWidget {
                           const SizedBox(height: 10),
                           const Text(
                             'Plant Name',
-                            style: TextStyle(color: Colors.green, fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Color.fromARGB(255, 23, 26, 23), fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 5),
                           const Padding(
@@ -169,7 +170,7 @@ class HomeUser extends StatelessWidget {
         width: 100,
         height: 100,
         decoration: BoxDecoration(
-          color: Colors.green.shade100,
+          color: const Color.fromARGB(255, 196, 250, 199),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -179,7 +180,7 @@ class HomeUser extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Color.fromARGB(255, 1, 36, 2), fontWeight: FontWeight.bold),
             ),
           ],
         ),
