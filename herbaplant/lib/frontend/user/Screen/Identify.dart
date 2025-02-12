@@ -6,6 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '/services/api_service.dart';
 import 'package:herbaplant/frontend/Auth/UserSignin.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class Identify extends StatefulWidget {
   const Identify({super.key});
@@ -15,6 +16,7 @@ class Identify extends StatefulWidget {
 }
 
 class _IdentifyState extends State<Identify> {
+  
   List<Map<String, dynamic>> messages = [];
   TextEditingController messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
@@ -24,15 +26,115 @@ class _IdentifyState extends State<Identify> {
   File? _image;
   bool _isLoading = false;
   bool _hasUserInteracted = false;
+// Tutorial Coach Mark /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  TutorialCoachMark? tutorialCoachMark;
+  List<TargetFocus> targets = [];
+  GlobalKey chatkey = GlobalKey();
+  GlobalKey CameraKey = GlobalKey();
+  GlobalKey Chatboxkey = GlobalKey();
 
-  void _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove("token");
-    debugPrint("🔓 Token cleared.");
-    if (mounted) {
-      GoRouter.of(context).go('/login');
-    }
+  @override
+  void initState() {
+  super.initState();
+  _initTarget(); // Initialize targets but don't start the tutorial yet
   }
+
+  void _showTutorialCoachMark(){
+    _initTarget();
+    tutorialCoachMark = TutorialCoachMark(
+      targets: targets,
+      pulseEnable: false,
+      colorShadow: Colors.green,
+      onClickTarget: (target) {
+        print(target.identify);
+      },
+      hideSkip: false,
+      onFinish: () {
+        print("finish");
+      },
+    )..show(context: context);  
+  }
+
+  void _initTarget(){
+    targets = [
+      TargetFocus(
+        identify: "chatbox-key",
+        keyTarget: Chatboxkey,
+        shape: ShapeLightFocus.RRect,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder:  (context, controller) {
+              return CoachMarkDesc( 
+                text: "Chat Box to communicate with the bot",
+                onNext: () {
+                  controller.next();
+                },
+                onSkip: () {
+                  controller.skip();
+                },
+              );
+            } 
+          ),
+        ]
+      ),
+
+      TargetFocus(
+        identify: "chat-key",
+        keyTarget: chatkey,
+        shape: ShapeLightFocus.RRect,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder:  (context, controller) {
+              return CoachMarkDesc( 
+                text: "Chat with the bot to identify plants",
+                onNext: () {
+                  controller.next();
+                },
+                onSkip: () {
+                  controller.skip();
+                },
+              );
+            } 
+          ),
+        ]
+      ),
+
+      TargetFocus(
+        identify: "camera-key",
+        keyTarget: CameraKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder:  (context, controller) {
+              return CoachMarkDesc( 
+                text: "Click here to take a photo or Select of the plant you want to identify",
+                onNext: () {
+                  controller.next();
+                },
+                onSkip: () {
+                  controller.skip();
+                },
+              );
+            } 
+          ),
+        ]
+      )
+    ];
+  }
+  
+  
+      
+// Tutorial Coach Mark /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // void _logout() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.remove("token");
+  //   debugPrint("🔓 Token cleared.");
+  //   if (mounted) {
+  //     GoRouter.of(context).go('/login');
+  //   }
+  // }
 
   void _selectMedia(ImageSource source) async {
     XFile? pickedFile = await _picker.pickImage(source: source);
@@ -127,12 +229,13 @@ class _IdentifyState extends State<Identify> {
     }
     _scrollToBottom();
   }
+
   void _sendMessage() {
     if (messageController.text.isNotEmpty) {
       setState(() {
         messages.add({'type': 'text', 'content': messageController.text});
         messageController.clear();
-        _hasUserInteracted = true; 
+        _hasUserInteracted = true;
       });
       _scrollToBottom();
     }
@@ -159,86 +262,102 @@ class _IdentifyState extends State<Identify> {
         ),
         actions: [
           //IconButton(
-            //icon: const Icon(Icons.logout, color: Colors.white),
-            //onPressed: _logout,
+          //icon: const Icon(Icons.logout, color: Colors.white),
+          //onPressed: _logout,
           //),
+           
+          IconButton(
+            icon: const Icon(Icons.info_outline, color: Colors.white),
+            onPressed: _showTutorialCoachMark,
+          ),
         ],
+      
+        
       ),
       body: Column(
         children: [
-          if (_isLoading)
-            const LinearProgressIndicator(color: Colors.green),
+          if (_isLoading) const LinearProgressIndicator(color: Colors.green),
 
           // Show welcome message & Lottie only if user hasn't interacted
           if (!_hasUserInteracted) ...[
-            
             // const Text(
             //   "Hi, User",
             //   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.black),
             // ),
-            
+
             const SizedBox(height: 8),
             const Text(
               "Identify Herbal Plant in your local area!",
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 12),
-            Lottie.asset("assets/animations/scanplanta.json", width: 200, height: 200),
+            Lottie.asset("assets/animations/scanplanta.json",
+                width: 200, height: 200),
             const SizedBox(height: 20),
           ],
 
           // Chat messages
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final message = messages[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      padding: message['type'] == 'text'
-                          ? const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)
-                          : EdgeInsets.zero,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.75,
-                      ),
-                      child: message['type'] == 'text'
-                          ? Text(
-                              message['content'],
-                              style: const TextStyle(color: Colors.black, fontSize: 16),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Image.file(
-                                File(message['content']),
-                                width: 200,
-                                height: 200,
-                                fit: BoxFit.cover,
+          Container(
+            key: Chatboxkey ,
+            child: Expanded(
+              child: ListView.builder(
+                controller: _scrollController,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 4.0, horizontal: 8.0),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        padding: message['type'] == 'text'
+                            ? const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0)
+                            : EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.75,
+                        ),
+                        child: message['type'] == 'text'
+                            ? Text(
+                                message['content'],
+                                style: const TextStyle(
+                                    color: Colors.black, fontSize: 16),
+                              )
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  File(message['content']),
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                            ),
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
 
           // Chat input section
           Container(
+            key: chatkey,
             color: Colors.white,
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.attach_file, color: Colors.green),
-                  onPressed: _showImageSourceDialog,
+                Container(
+                  key: CameraKey,
+                  child: IconButton(
+                    icon: const Icon(Icons.attach_file, color: Colors.green),
+                    onPressed: _showImageSourceDialog,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -266,6 +385,91 @@ class _IdentifyState extends State<Identify> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+
+class CoachMarkDesc extends StatefulWidget {
+  const CoachMarkDesc({
+    super.key,
+    required this.text,
+    this.skip = "Skip",
+    this.next = "Next",
+    this.onSkip,
+    this.onNext,
+  });
+
+  final String text;
+  final String skip;
+  final String next;
+  final void Function()? onSkip;
+  final void Function()? onNext;
+
+  @override
+  State<CoachMarkDesc> createState() => _CoachMarkDescState();
+}
+
+class _CoachMarkDescState extends State<CoachMarkDesc> 
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override 
+   void initState() {
+    _controller = AnimationController(
+      vsync: this,
+      lowerBound: 0,
+      upperBound: 20,
+      duration: const Duration(milliseconds: 500),
+    )..repeat(min: 0, max: 20, reverse: true);
+    super.initState();
+  
+   }
+  @override 
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _controller.value),
+          child: child,
+        );
+      },
+      child: Container(
+        padding: const  EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.text,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Row( 
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: widget.onSkip,
+                  child: Text(widget.skip),
+                ),
+                TextButton(
+                  onPressed: widget.onNext,
+                  child: Text(widget.next),
+                ),
+              ],
+            ),
+          ],
+        ),
+      
       ),
     );
   }
