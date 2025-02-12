@@ -78,6 +78,7 @@ flutter:
       - assets/image/logo-new.png
       - assets/image/intro_chat.png
       - assets/animations/typing.gif
+      - assets/image/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
