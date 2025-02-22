@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:herbaplant/frontend/user/Screen/Homeuser.dart';
+import 'package:go_router/go_router.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../services/api_service.dart';
-import '../../Auth/UserSignin.dart';
-import 'main_navigation.dart'; 
 
 //user guide by flutter/dart package
-
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
   void _onIntroEnd(BuildContext context) async {
-    await ApiService.updateFirstTimeLogin();
+    try {
+      bool success = await ApiService.updateFirstTimeLogin();  
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MainNavigation()),
-    );
+      if (success) {
+        print("✅ First-time login updated successfully!");
+      } else {
+        print("⚠️ Failed to update first-time login");
+      }
+
+      if (context.mounted) {  
+        GoRouter.of(context).go('/home'); 
+      }
+    } catch (e) {
+      print("❌ Error in onboarding: $e");
+    }
   }
 
-   @override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -43,7 +49,6 @@ class OnboardingScreen extends StatelessWidget {
         ),
         child: IntroductionScreen(
           pages: [
-            // Page 1 - Welcome Screen
             PageViewModel(
               title: "Welcome to Herbaplant!",
               body: "Discover and identify herbal plants around you.",
@@ -52,8 +57,6 @@ class OnboardingScreen extends StatelessWidget {
               ),
               decoration: _pageDecoration(),
             ),
-
-            // Page 2 - Scan and Diagnose
             PageViewModel(
               title: "Scan and Diagnose",
               body: "Take a picture to get herbal plant details instantly!",
@@ -62,8 +65,6 @@ class OnboardingScreen extends StatelessWidget {
               ),
               decoration: _pageDecoration(),
             ),
-
-            // Page 3 - Chatbot
             PageViewModel(
               title: "Ask About Herbal Plants",
               body: "Have questions about a herb? Chat and get instant details on herbal plants!",
@@ -115,3 +116,4 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 }
+
