@@ -139,9 +139,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           ),
                   ),
 
-
                   TextButton(
-                    onPressed: () => GoRouter.of(context).go('/login'),
+                    onPressed: () {
+                      if (GoRouter.of(context).canPop()) {
+                        GoRouter.of(context).pop(); // Go back if possible
+                      } else {
+                        GoRouter.of(context).go('/login'); // If no previous screen, go to login
+                      }
+                    },
                     child: Text(
                       'Cancel',
                       style: TextStyle(fontSize: 16, color: Colors.grey),
