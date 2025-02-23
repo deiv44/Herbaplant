@@ -68,7 +68,7 @@ dev_dependencies:
 flutter:
   assets:
       - assets/image/Logo.png
-      - assets/image/bgpalnt.jpg 
+      - assets/image/bgplant.jpg 
       - assets/image/logo_icon.png
       - assets/image/logonobg.png
       - assets/animations/

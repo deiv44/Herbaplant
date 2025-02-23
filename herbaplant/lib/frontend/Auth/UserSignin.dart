@@ -20,35 +20,42 @@ class _UserSigninState extends State<UserSignin> {
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _isLoading = false; 
+  final bool _isLoading = false; 
 
   //  Handle Login
   void _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      String? token = await ApiService.loginUser(
+      final response = await ApiService.loginUser(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
 
-      if (token != null) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", token);
+      if (response != null) {
+        if (response.containsKey("error")) {
+          String errorMessage = response["error"];
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("⚠️ $errorMessage")),
+          );
+        } else if (response.containsKey("token")) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString("token", response["token"]);
 
-        // Fetch `first_time_login` from the backend
-        bool isFirstLogin = await ApiService.checkFirstTimeLogin();
+          bool isFirstLogin = await ApiService.checkFirstTimeLogin();
 
-        if (isFirstLogin) {
-          GoRouter.of(context).go('/onboarding'); // First-time login > Onboarding (eto ung user guide pag first time maglogin ng)
-        } else {
-          GoRouter.of(context).go('/home'); // Already logged in > Home
+          if (isFirstLogin) {
+            GoRouter.of(context).go('/onboarding');
+          } else {
+            GoRouter.of(context).go('/home');
+          }
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login failed! Please check your credentials.")),
+          const SnackBar(content: Text("❌ Login failed. Please try again.")),
         );
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +67,7 @@ class _UserSigninState extends State<UserSignin> {
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/image/bgpalnt.jpg'),
+                image: AssetImage('assets/image/bgplant.jpg'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   Colors.white.withOpacity(0.9),
@@ -242,6 +249,35 @@ class _UserSigninState extends State<UserSignin> {
                             ),
 
                             const SizedBox(height: 18),
+
+                            // Resend Verification Email Button
+                            ElevatedButton(
+                              onPressed: () async {
+                                bool success = await ApiService.sendVerificationEmail();
+                                if (success) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("📧 Verification email sent! Check your inbox."),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("⚠️ Failed to resend verification email."),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              child: Text("Resend Verification Email", style: TextStyle(color: Colors.white)),
+                            ),
+
 
                             Row(
                               children: [

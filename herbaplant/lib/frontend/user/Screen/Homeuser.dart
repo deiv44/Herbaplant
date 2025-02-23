@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:herbaplant/frontend/user/Screen/Identify.dart';
 import 'main_navigation.dart';
 import 'package:lottie/lottie.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
@@ -13,6 +16,8 @@ class HomeUser extends StatefulWidget {
 class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin {
   late AnimationController _lottieController;
 
+  String userName = "User"; 
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +27,36 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
         _lottieController.stop();
       }
     });
+
+    _fetchUserInfo();
+  }
+
+  void _fetchUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+
+    if (token == null) {
+      print("❌ No token found in SharedPreferences");
+      return;
+    }
+
+    final url = Uri.parse("http://172.20.10.7:5000/auth/user-info");
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      setState(() {
+        userName = data["username"] ?? "Unknown";
+      });
+    } else {
+      print("❌ Failed to fetch user info: ${response.body}");
+    }
   }
 
   @override
@@ -38,9 +73,9 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
         backgroundColor: Colors.green,
         elevation: 0,
         centerTitle: false,
-        title: const Text(
-          'Herbalbal',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+        title: Text(
+          "Hi, $userName", // Display user's name
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         actions: [
           Padding(
@@ -49,7 +84,7 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
               width: 50,
               height: 50,
               child: Lottie.asset(
-                'assets/animations/growplant.json', // Replace with your actual file
+                'assets/animations/growplant.json',
                 controller: _lottieController,
                 onLoaded: (composition) {
                   _lottieController
@@ -66,24 +101,24 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _featureBox(context, Icons.camera_alt_rounded, 'Identify', 1),
-                        _featureBox(context, Icons.history, 'History', 2),
-                        _featureBox(context, Icons.person, 'Profile', 3),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(16.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Expanded(
+            //         child: Row(
+            //           mainAxisAlignment: MainAxisAlignment.spaceAround,
+            //           children: [
+            //             _featureBox(context, Icons.camera_alt_rounded, 'Identify', 1),
+            //             _featureBox(context, Icons.history, 'History', 2),
+            //             _featureBox(context, Icons.person, 'Profile', 3),
+            //           ],
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
@@ -205,25 +240,6 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
                     ),
                   );
                 },
-              ),
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.eco,
-                    size: 50,
-                    color: Colors.green,
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Botanist in your pocket',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
-                  ),
-                  const SizedBox(height: 20),
-                ],
               ),
             ),
           ],

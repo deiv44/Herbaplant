@@ -37,44 +37,57 @@ class _UserSignupState extends State<UserSignup> {
 
     setState(() => _isLoading = false);
 
-    if (response != null) {
-      if (response.toLowerCase().contains("successful")) {
-        _showSnackbar("Registration Successful!", const Color.fromARGB(255, 77, 174, 80), Icons.check_circle);
-
-        Future.delayed(const Duration(seconds: 2), () {
+      if (response != null) {
+        if (response.toLowerCase().contains("successful")) {
+          _showSnackbar("Registration Successful! Check your email to verify.", Colors.green, Icons.check_circle);
           Navigator.pop(context); // Redirect back to login after success
-        });
-      } else {
-        _showSnackbar(response, Colors.red, Icons.error);
+          } else {
+            _showSnackbar(response, Colors.red, Icons.error);
+          }
+        } else {
+          _showSnackbar("Registration failed!", Colors.red, Icons.error);
+        }
       }
-    } else {
-      _showSnackbar("Registration failed!", Colors.red, Icons.error);
-    }
-  }
 
-  // Snackbar Helper
-  void _showSnackbar(String message, Color bgColor, IconData icon) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(icon, color: Colors.white),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      void _showVerificationDialog() {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Verify Your Email"),
+            content: const Text("A verification email has been sent. Please check your inbox."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context), // Close dialog
+                child: const Text("OK"),
               ),
+            ],
+          ),
+        );
+      }
+
+      // Snackbar Helper
+      void _showSnackbar(String message, Color bgColor, IconData icon) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(icon, color: Colors.white),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-        backgroundColor: bgColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
+            backgroundColor: bgColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
 
 
   @override
@@ -83,7 +96,7 @@ class _UserSignupState extends State<UserSignup> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/image/bgpalnt.jpg'),
+            image: AssetImage('assets/image/bgplant.jpg'),
             fit: BoxFit.cover,
           ),
         ),

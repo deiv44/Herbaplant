@@ -6,7 +6,7 @@ import 'package:http_parser/http_parser.dart';
 
 
 class ApiService {
-  static const String baseUrl = "http://127.0.0.1:5000";
+  static const String baseUrl = "http://172.20.10.7:5000";
 
   // Fetch first_time_login from backend
   static Future<bool> checkFirstTimeLogin() async {
@@ -43,35 +43,63 @@ class ApiService {
   }
 
   // Update first_time_login to false after onboarding
-  static Future<void> updateFirstTimeLogin() async {
+  static Future<bool> updateFirstTimeLogin() async {
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString("token");
 
     if (token == null) {
-      print("No token found, skipping first-time login update.");
-      return;
+      print("No token found in SharedPreferences");
+      return false;
     }
 
     final url = Uri.parse("$baseUrl/auth/update-first-time-login");
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      },
+    );
 
-    try {
+    if (response.statusCode == 200) {
+      print("First-time login updated successfully!");
+      return true;
+    } else {
+      print("Failed to update first-time login: ${response.body}");
+      return false;
+    }
+  }
+
+  // Send Verification Email
+    static Future<bool> sendVerificationEmail() async {
+      final prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString("token");
+
+      if (token == null) {
+        print("No token found in SharedPreferences"); //debugging purposes
+        return false;
+      }
+
+      final url = Uri.parse("$baseUrl/auth/send-verification");
       final response = await http.post(
         url,
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer $token",
+          "Authorization": "Bearer $token"
         },
       );
 
+      print("📡 Response Code: ${response.statusCode}");
+      print("📨 Response Body: ${response.body}");
+
       if (response.statusCode == 200) {
-        print("Successfully updated first_time_login to false.");
+        print("Resent verification email!");
+        return true;
       } else {
-        print("Failed to update first_time_login: ${response.body}");
+        print("Failed to resend verification email: ${response.body}");
+        return false;
       }
-    } catch (e) {
-      print("Network error: $e");
     }
-  }
 
   // AI Model Prediction
   static Future<Map<String, dynamic>?> predictPlant(File imageFile) async {
@@ -83,7 +111,7 @@ class ApiService {
       return {"error": "Authentication error: Please log in first."};
     }
 
-    var url = Uri.parse("http://127.0.0.1:5000/plant/predict");
+    var url = Uri.parse("http://172.20.10.7:5000/plant/predict");
 
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
@@ -95,10 +123,10 @@ class ApiService {
     ));
 
     // Debugging logs - wag muna tanggaling
-    print("📸 Sending image: ${imageFile.path}");
-    print("🔗 URL: $url");
-    print("🛠 Headers: ${request.headers}");
-    print("📤 Sending request...");
+    print("Sending image: ${imageFile.path}");
+    print("URL: $url");
+    print("Headers: ${request.headers}");
+    print("Sending request...");
 
     try {
       var response = await request.send();
@@ -117,7 +145,6 @@ class ApiService {
       return {"error": "Prediction failed due to an error."};
     }
   }
-
 
   // Register a New User
   static Future<String?> registerUser(String username, String email, String password) async {
@@ -146,9 +173,9 @@ class ApiService {
   }
 
   // User Login
-  static Future<String?> loginUser(String email, String password) async {
+  static Future<Map<String, dynamic>?> loginUser(String email, String password) async {
     final url = Uri.parse("$baseUrl/auth/login");
-
+    
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
@@ -156,19 +183,9 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final String token = data["token"];
-
-      // Save token in SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString("token", token);
-
-      print("Token saved: $token");
-
-      return token;
+      return jsonDecode(response.body);  
     } else {
-      print("⚠️ Login failed: ${response.body}");
-      return null;
+      return jsonDecode(response.body); 
     }
   }
 
@@ -208,5 +225,67 @@ class ApiService {
     return {"message": "Failed to send email"}; 
   }
 }
+
+  // User Info
+  static Future<Map<String, dynamic>?> getUserInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+
+    if (token == null) {
+      print("❌ No token found in SharedPreferences");
+      return null;
+    }
+
+    final url = Uri.parse("$baseUrl/auth/user-info");
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      print("❌ Failed to fetch user info: ${response.body}");
+      return null;
+    }
+  }
+
+  static Future<bool> updateUserInfo(String field, String newValue) async {
+  final prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString("token");
+
+    if (token == null) {
+      print("❌ No token found in SharedPreferences");
+      return false;
+    }
+
+    final url = Uri.parse("$baseUrl/auth/update-user");
+    final response = await http.put(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      },
+      body: jsonEncode({field: newValue}),
+    );
+
+    if (response.statusCode == 200) {
+      print("✅ $field updated successfully!");
+
+      // Force logout if email is updated
+      if (field == "email") {
+        await prefs.remove("token"); 
+        print("🔓 User logged out due to email change.");
+      }
+
+      return true;
+    } else {
+      print("❌ Failed to update $field: ${response.body}");
+      return false;
+    }
+  }
 
 }

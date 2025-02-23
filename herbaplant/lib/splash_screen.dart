@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-import 'frontend/Auth/UserSignin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'frontend/user/Screen/onboarding.dart';
-import 'frontend/user/Screen/main_navigation.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
