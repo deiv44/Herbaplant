@@ -242,7 +242,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
             onPressed: () {
               if (newPasswordController.text != retypePasswordController.text) {
                 setState(() {
-                  _passwordError = "❌ Passwords do not match!";
+                  _passwordError = "  Passwords do not match!";
                 });
                 return;
               } else {
@@ -314,11 +314,11 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
                   final success = await ApiService.updateUserInfo("email", newEmail);
 
                   if (success) {
-                    debugPrint("✅ Email updated successfully.");
+                    debugPrint("  Email updated successfully.");
                     await Future.delayed(const Duration(milliseconds: 500)); 
                     _logout(); // 
                   } else {
-                    debugPrint("❌ Failed to update email.");
+                    debugPrint("  Failed to update email.");
                     if (mounted) {
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(

@@ -124,10 +124,10 @@ void _handleDeepLink(Uri uri) {
     }
   } else if (uri.path == "/verification-success") {
     // successful email verification
-    _showVerificationDialog("✅ Email Verified!", "Your email has been successfully verified.");
+    _showVerificationDialog("  Email Verified!", "Your email has been successfully verified.");
   } else if (uri.path == "/verification-failed") {
     // failure
-    _showVerificationDialog("❌ Verification Failed", "The verification link is invalid or expired.");
+    _showVerificationDialog("  Verification Failed", "The verification link is invalid or expired.");
   } else if (uri.path == "/verification-expired") {
     // expired link
     _showVerificationDialog("⚠️ Verification Expired", "The verification link has expired. Please try again.");

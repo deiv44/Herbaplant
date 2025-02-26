@@ -6,7 +6,9 @@ import 'package:http_parser/http_parser.dart';
 
 
 class ApiService {
-  static const String baseUrl = "http://172.20.10.7:5000";
+  // static const String baseUrl = "http://172.20.10.7:5000";
+  static const String baseUrl = "http://192.168.100.203:5000";
+
 
   // Fetch first_time_login from backend
   static Future<bool> checkFirstTimeLogin() async {
@@ -89,8 +91,8 @@ class ApiService {
         },
       );
 
-      print("📡 Response Code: ${response.statusCode}");
-      print("📨 Response Body: ${response.body}");
+      print("Response Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         print("Resent verification email!");
@@ -111,22 +113,17 @@ class ApiService {
       return {"error": "Authentication error: Please log in first."};
     }
 
-    var url = Uri.parse("http://172.20.10.7:5000/plant/predict");
-
+    var url = Uri.parse("$baseUrl/plant/predict");
     var request = http.MultipartRequest('POST', url);
     request.headers['Authorization'] = 'Bearer $token';
-    request.headers['Content-Type'] = 'multipart/form-data';  
+    request.headers['Content-Type'] = 'multipart/form-data';
 
     request.files.add(await http.MultipartFile.fromPath(
       'file', imageFile.path,
       contentType: MediaType('image', 'jpeg'),
     ));
 
-    // Debugging logs - wag muna tanggaling
-    print("Sending image: ${imageFile.path}");
-    print("URL: $url");
-    print("Headers: ${request.headers}");
-    print("Sending request...");
+    print("Sending request to: $url");
 
     try {
       var response = await request.send();
@@ -145,6 +142,7 @@ class ApiService {
       return {"error": "Prediction failed due to an error."};
     }
   }
+
 
   // Register a New User
   static Future<String?> registerUser(String username, String email, String password) async {
@@ -193,7 +191,7 @@ class ApiService {
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove("token");
-    print("🔓 Token cleared.");
+    print("Token cleared.");
   }
 
   // Reset Password
@@ -232,7 +230,7 @@ class ApiService {
     String? token = prefs.getString("token");
 
     if (token == null) {
-      print("❌ No token found in SharedPreferences");
+      print("No token found in SharedPreferences");
       return null;
     }
 
@@ -248,7 +246,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      print("❌ Failed to fetch user info: ${response.body}");
+      print("Failed to fetch user info: ${response.body}");
       return null;
     }
   }
@@ -258,7 +256,7 @@ class ApiService {
   String? token = prefs.getString("token");
 
     if (token == null) {
-      print("❌ No token found in SharedPreferences");
+      print("  No token found in SharedPreferences");
       return false;
     }
 
@@ -273,7 +271,7 @@ class ApiService {
     );
 
     if (response.statusCode == 200) {
-      print("✅ $field updated successfully!");
+      print("  $field updated successfully!");
 
       // Force logout if email is updated
       if (field == "email") {
@@ -283,7 +281,7 @@ class ApiService {
 
       return true;
     } else {
-      print("❌ Failed to update $field: ${response.body}");
+      print("  Failed to update $field: ${response.body}");
       return false;
     }
   }
