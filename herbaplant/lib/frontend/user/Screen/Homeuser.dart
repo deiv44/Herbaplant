@@ -40,8 +40,7 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
       return;
     }
 
-    // final url = Uri.parse("http://172.20.10.7:5000/auth/user-info");
-    final url = Uri.parse("http://192.168.100.203:5000/auth/user-info");
+    final url = Uri.parse("http://192.168.100.182:5000/auth/user-info"); //update to URL based on your ip
     
     final response = await http.get(
       url,

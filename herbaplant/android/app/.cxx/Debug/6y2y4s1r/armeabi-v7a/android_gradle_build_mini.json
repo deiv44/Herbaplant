@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "D:\\Android\\Projects\\Herbaplant\\flutter\\packages\\flutter_tools\\gradle\\src\\main\\groovy\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\kittie\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\Android\\Projects\\Herba\\Herbaplant\\herbaplant\\android\\app\\.cxx\\Debug\\6y2y4s1r\\armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\kittie\\AppData\\Local\\Android\\sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\Android\\Projects\\Herba\\Herbaplant\\herbaplant\\android\\app\\.cxx\\Debug\\6y2y4s1r\\armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

@@ -1,0 +1,2 @@
+D:/Android/Projects/Herba/Herbaplant/herbaplant/android/app/.cxx/Debug/6y2y4s1r/x86/CMakeFiles/edit_cache.dir
+D:/Android/Projects/Herba/Herbaplant/herbaplant/android/app/.cxx/Debug/6y2y4s1r/x86/CMakeFiles/rebuild_cache.dir

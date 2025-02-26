@@ -6,8 +6,7 @@ import 'package:http_parser/http_parser.dart';
 
 
 class ApiService {
-  // static const String baseUrl = "http://172.20.10.7:5000";
-  static const String baseUrl = "http://192.168.100.203:5000";
+  static const String baseUrl = "http://192.168.100.182:5000"; //update URL to match your ip address
 
 
   // Fetch first_time_login from backend
