@@ -180,52 +180,56 @@ class _IdentifyState extends State<Identify> {
       _isLoading = true;
       _hasUserInteracted = true;
     });
-    try {
-      Map<String, dynamic>? result = await ApiService.predictPlant(image);
-      if (result == null || result.containsKey("error")) {
-        setState(() {
-          messages.add({
-            'type': 'text',
-            'content':
-                "Prediction failed: ${result?['error'] ?? 'Unknown error'}"
+
+      try {
+        Map<String, dynamic>? result = await ApiService.predictPlant(image);
+        print("API Response: $result"); // Debugging
+
+        if (result == null || result.containsKey("error")) {
+          setState(() {
+            messages.add({
+              'type': 'text',
+              'content': "Prediction failed: ${result?['error'] ?? 'Unknown error'}"
+            });
           });
-        });
-        return;
-      }
-      String plantName = result['plant'] ?? "Unknown Plant";
-      String family = result['family'] ?? "Unknown Family";
-      String usage = result['usage'] ?? "No usage information available.";
-      String benefits = result['benefits'] ?? "No benefits listed.";
-      String confidence = result['confidence'] ?? "0%";
-      String formattedMessage = """
-        Detected Plant:  
-        $plantName  
-        Family:
-        $family  
-        Usage:  
-        $usage  
-        Benefits:  
-        $benefits  
-        Confidence: 
-        $confidence  
-        """;
-      setState(() {
-        _result = plantName;
-        messages.add({'type': 'text', 'content': formattedMessage});
-      });
-    } catch (e) {
-      print("⚠️ Error during prediction: $e");
-      setState(() {
-        messages
-            .add({'type': 'text', 'content': " Prediction failed. Try again."});
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+          return;
+        }
+
+        String plantName = result['common_name']?.toString() ?? "Unknown Plant"; 
+        String scientificName = result['scientific_name']?.toString() ?? "Unknown Scientific Name";
+        double confidenceValue = double.tryParse(result['confidence']?.replaceAll("%", "") ?? "0") ?? 0.0; 
+        String confidence = "${confidenceValue.toStringAsFixed(2)}%";
+
+        String formattedMessage = """
+          **Detected Plant:**  
+          $plantName  
+
+          **Scientific Name:**  
+          $scientificName  
+
+          **Confidence:**  
+          $confidence  
+          """;
+
+          setState(() {
+            _result = plantName;
+            messages.add({'type': 'text', 'content': formattedMessage});
+          });
+
+      } catch (e) {
+          print("⚠️ Error during prediction: $e");
+          setState(() {
+            messages.add({'type': 'text', 'content': "Prediction failed. Try again."});
+          });
+        } finally {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+
     _scrollToBottom();
   }
+
 
   void _sendMessage() {
     if (messageController.text.isNotEmpty) {

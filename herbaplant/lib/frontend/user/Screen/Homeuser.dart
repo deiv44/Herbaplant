@@ -36,11 +36,13 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
     String? token = prefs.getString("token");
 
     if (token == null) {
-      print("❌ No token found in SharedPreferences");
+      print("  No token found in SharedPreferences");
       return;
     }
 
-    final url = Uri.parse("http://172.20.10.7:5000/auth/user-info");
+    // final url = Uri.parse("http://172.20.10.7:5000/auth/user-info");
+    final url = Uri.parse("http://192.168.100.203:5000/auth/user-info");
+    
     final response = await http.get(
       url,
       headers: {
@@ -55,7 +57,7 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
         userName = data["username"] ?? "Unknown";
       });
     } else {
-      print("❌ Failed to fetch user info: ${response.body}");
+      print("  Failed to fetch user info: ${response.body}");
     }
   }
 

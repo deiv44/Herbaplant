@@ -50,7 +50,7 @@ class _UserSigninState extends State<UserSignin> {
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("❌ Login failed. Please try again.")),
+          const SnackBar(content: Text("  Login failed. Please try again.")),
         );
       }
     }

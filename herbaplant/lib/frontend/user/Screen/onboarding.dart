@@ -13,7 +13,7 @@ class OnboardingScreen extends StatelessWidget {
       bool success = await ApiService.updateFirstTimeLogin();  
 
       if (success) {
-        print("✅ First-time login updated successfully!");
+        print("  First-time login updated successfully!");
       } else {
         print("⚠️ Failed to update first-time login");
       }
@@ -22,7 +22,7 @@ class OnboardingScreen extends StatelessWidget {
         GoRouter.of(context).go('/home'); 
       }
     } catch (e) {
-      print("❌ Error in onboarding: $e");
+      print("  Error in onboarding: $e");
     }
   }
 
