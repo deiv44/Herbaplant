@@ -8,7 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'frontend/Auth/Forgotpass.dart';
 import 'frontend/Auth/Resetpass.dart'; 
 import 'frontend/Auth/Checkemail.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 import 'dart:async';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -89,27 +89,30 @@ void main() async {
 }
 
 // Initialize Deep Linking
-StreamSubscription<String?>? _sub;
+StreamSubscription<Uri?>? _sub;
 
 void _initDeepLink() async {
   try {
-    Uri? initialUri = await getInitialUri();
+    final appLinks = AppLinks();
+
+    Uri? initialUri = await appLinks.getInitialAppLink();
     if (initialUri != null) {
       _handleDeepLink(initialUri);
     }
 
-    _sub = linkStream.listen((String? link) {
-      if (link != null) {
-        Uri uri = Uri.parse(link); 
-        _handleDeepLink(uri);
+    _sub = appLinks.uriLinkStream.listen((Uri? link) {
+      if (link !=null) {
+        _handleDeepLink(link);
       }
     }, onError: (err) {
       debugPrint("Deep link error: $err");
     });
-  } catch (e) {
-    debugPrint("Deep link initialization failed: $e");
-  }
+    } catch (e) {
+      debugPrint("Deep link initialization failed: $e");
+    }
 }
+
+    
 
 void disposeDeepLinkListener() {
   _sub?.cancel();

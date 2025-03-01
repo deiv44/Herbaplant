@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:herbaplant/services/api_service.dart';
 import 'main_navigation.dart';
 import 'package:lottie/lottie.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
@@ -21,6 +24,8 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
+
+    // Initialize Lottie animation controller
     _lottieController = AnimationController(vsync: this);
     _lottieController.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -28,8 +33,13 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
       }
     });
 
+    // Fetch user info
     _fetchUserInfo();
+
+    // Fetch trending news
+    _fetchTrendingNews();
   }
+
 
   void _fetchUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
@@ -40,7 +50,7 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
       return;
     }
 
-    // final url = Uri.parse("http://172.20.10.7:5000/auth/user-info");
+    // final url = Uri.parse("http://172.20.10.7:5000/auth/user-info"); //uncomment for running thru mobile data
     final url = Uri.parse("http://192.168.100.203:5000/auth/user-info");
     
     final response = await http.get(
@@ -66,6 +76,27 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
     _lottieController.dispose();
     super.dispose();
   }
+
+  List<dynamic> trendingNews = [];
+
+    void _fetchTrendingNews() async {
+      List<dynamic> fetchedNews = await ApiService.fetchTrendingNews();
+      setState(() {
+        trendingNews = fetchedNews;
+      });
+    }
+
+    void _openNewsArticle(String url) async {
+      final Uri uri = Uri.parse(url);
+
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        print("Could not launch $url");
+      }
+    }
+    
+
 
   @override
   Widget build(BuildContext context) {
@@ -124,61 +155,70 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
-                'Trending in Philippines',
+                'What\'s New?',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0)),
               ),
             ),
             SizedBox(
               height: 250,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.all(16.0),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      width: 250,
-                      margin: const EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade100,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
+              child: trendingNews.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.all(16.0),
+                       itemCount: trendingNews.length > 3 ? 3 : trendingNews.length,
+                      itemBuilder: (context, index) {
+                        final article = trendingNews[index];
+                        return GestureDetector(
+                          onTap: () => _openNewsArticle(article["url"]),
+                          child: Container(
+                            width: 250,
+                            margin: const EdgeInsets.only(right: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade100,
                               borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                'https://via.placeholder.com/250',
-                                width: 250,
-                                fit: BoxFit.cover,
-                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      article["image"] ?? "https://via.placeholder.com/250",
+                                      width: 250,
+                                      height: 150,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  article["title"] ?? "No Title",
+                                  style: TextStyle(color: Colors.green, fontSize: 16, fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 5),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Text(
+                                    article["description"] ?? "No description available",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Colors.black, fontSize: 12),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'Plant Name',
-                            style: TextStyle(color: Colors.green, fontSize: 16, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 5),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              'Brief description about the plant.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black, fontSize: 12),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
+
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
