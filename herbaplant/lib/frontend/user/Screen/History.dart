@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:herbaplant/services/api_service.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
@@ -9,13 +10,38 @@ class History extends StatefulWidget {
 }
 
 class _HistoryState extends State<History> {
-  List<String> plantHistory = []; // Initially empty, add data dynamically
+  List<Map<String, dynamic>> searchHistory = [];
+  List<Map<String, dynamic>> filteredHistory = [];
+
+    @override
+  void initState() {
+    super.initState();
+    fetchHistory();
+  }
+
+  // Fetch history from API
+  Future<void> fetchHistory() async {
+    List<Map<String, dynamic>> history = await ApiService.fetchSearchHistory();
+    setState(() {
+      searchHistory = history;
+      filteredHistory = history;
+    });
+  }
+
+  // Search filter
+  void filterSearch(String query) {
+    setState(() {
+      filteredHistory = searchHistory.where((plant) {
+        return plant["plant_name"].toLowerCase().contains(query.toLowerCase());
+      }).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Plant History'),
+        title: Text('Search History'),
         backgroundColor: Colors.green,
       ),
       body: Padding(
@@ -31,15 +57,13 @@ class _HistoryState extends State<History> {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              onChanged: (query) {
-                // Implement search functionality here
-              },
+              onChanged: filterSearch,
             ),
             SizedBox(height: 20),
 
             // Check if history is empty
             Expanded(
-              child: plantHistory.isEmpty
+              child: filteredHistory.isEmpty
                   ? Center(
                       child: Lottie.asset(
                         'assets/animations/historyn.json', // Ensure this file exists in assets
@@ -47,18 +71,19 @@ class _HistoryState extends State<History> {
                       ),
                     )
                   : ListView.builder(
-                      itemCount: plantHistory.length,
+                      itemCount: filteredHistory.length,
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
                             leading: Icon(Icons.history, color: Colors.green),
-                            title: Text(plantHistory[index]),
+                            title: Text(filteredHistory[index]["plant_name"]),
+                            subtitle: Text("Confidence: ${filteredHistory[index]["confidence"]}%"),
                             trailing: Icon(Icons.arrow_forward),
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => DetailsScreen(plantName: plantHistory[index]),
+                                  builder: (context) => DetailsScreen(plantName: filteredHistory[index]["plant_name"]),
                                 ),
                               );
                             },
