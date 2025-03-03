@@ -6,7 +6,7 @@ import 'package:http_parser/http_parser.dart';
 
 
 class ApiService {
-  // static const String baseUrl = "http://172.20.10.7:5000";
+  // static const String baseUrl = "http://172.20.10.7:5000"; //uncomment if running in mobile data
   static const String baseUrl = "http://192.168.100.203:5000";
 
 
@@ -138,11 +138,99 @@ class ApiService {
         return {"error": "Prediction failed. Server response: $responseBody"};
       }
     } catch (e) {
-      print("⚠️ Network/Processing Error: $e");
+      print("Network/Processing Error: $e");
       return {"error": "Prediction failed due to an error."};
     }
   }
 
+  // Save search history API call
+  static Future<void> saveSearchHistory(String plantName, String confidence) async {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+
+    if (token == null) {
+      print("⚠️ No token found");
+      return;
+    }
+
+    final url = Uri.parse("$baseUrl/search-history/save");
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "plant_name": plantName,
+          "confidence": confidence,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        print("Search history saved successfully!");
+      } else {
+        print("Failed to save search history: ${response.body}");
+      }
+    } catch (e) {
+      print("⚠️ Network error: $e");
+    }
+  }
+
+// Fetch Search History
+  static Future<List<Map<String, dynamic>>> fetchSearchHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+
+    if (token == null) {
+      print("⚠️ No token found");
+      return [];
+    }
+
+    final url = Uri.parse("$baseUrl/plant/search-history/get");
+
+    try {
+      final response = await http.get(url, headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json"
+      });
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        print("⚠️ Failed to fetch history: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("⚠️ Network error: $e");
+      return [];
+    }
+  }
+
+  // Gnews API for Articles
+  static const String gNewsApiKey = "c5169b26e80899bdb2210234b8ed11f1";
+
+  static Future<List<dynamic>> fetchTrendingNews() async {
+    final url = Uri.parse(
+        "https://gnews.io/api/v4/top-headlines?country=ph&category=health&apikey=$gNewsApiKey");
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data["articles"] ?? [];
+      } else {
+        print(" Failed to fetch news: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print(" Network error: $e");
+      return [];
+    }
+  }
 
   // Register a New User
   static Future<String?> registerUser(String username, String email, String password) async {
