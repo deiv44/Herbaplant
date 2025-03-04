@@ -15,7 +15,8 @@ class _UserSignupState extends State<UserSignup> {
   final TextEditingController _emailController = TextEditingController();
   // final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _acceptTerms = false;
   bool _isLoading = false;
@@ -23,7 +24,8 @@ class _UserSignupState extends State<UserSignup> {
   // Function to Handle Registration
   Future<void> _handleSignup() async {
     if (!_formKey.currentState!.validate() || !_acceptTerms) {
-      _showSnackbar("Please complete the form properly", Colors.red, Icons.warning);
+      _showSnackbar(
+          "Please complete the form properly", Colors.red, Icons.warning);
       return;
     }
 
@@ -37,69 +39,65 @@ class _UserSignupState extends State<UserSignup> {
 
     setState(() => _isLoading = false);
 
-      if (response != null) {
-        if (response.toLowerCase().contains("successful")) {
-          _showSnackbar("Registration Successful! Check your email to verify.", Colors.green, Icons.check_circle);
-          Navigator.pop(context); // Redirect back to login after success
-          } else {
-            _showSnackbar(response, Colors.red, Icons.error);
-          }
-        } else {
-          _showSnackbar("Registration failed!", Colors.red, Icons.error);
-        }
+    if (response != null) {
+      if (response.toLowerCase().contains("successful")) {
+        _showSnackbar("Registration Successful! Check your email to verify.",
+            Colors.green, Icons.check_circle);
+        Navigator.pop(context); // Redirect back to login after success
+      } else {
+        _showSnackbar(response, Colors.red, Icons.error);
       }
+    } else {
+      _showSnackbar("Registration failed!", Colors.red, Icons.error);
+    }
+  }
 
-      void _showVerificationDialog() {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text("Verify Your Email"),
-            content: const Text("A verification email has been sent. Please check your inbox."),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context), // Close dialog
-                child: const Text("OK"),
+  void _showVerificationDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Verify Your Email"),
+        content: const Text(
+            "A verification email has been sent. Please check your inbox."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context), // Close dialog
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Snackbar Helper
+  void _showSnackbar(String message, Color bgColor, IconData icon) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
               ),
-            ],
-          ),
-        );
-      }
-
-      // Snackbar Helper
-      void _showSnackbar(String message, Color bgColor, IconData icon) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(icon, color: Colors.white),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    message,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
             ),
-            backgroundColor: bgColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-
+          ],
+        ),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image/bgplant.jpg'),
-            fit: BoxFit.cover,
-          ),
-        ),
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
@@ -152,7 +150,8 @@ class _UserSignupState extends State<UserSignup> {
                       TextFormField(
                         controller: _usernameController,
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.person, color: Colors.green),
+                          prefixIcon:
+                              const Icon(Icons.person, color: Colors.green),
                           labelText: 'Username',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -172,14 +171,17 @@ class _UserSignupState extends State<UserSignup> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.email, color: Colors.green),
+                          prefixIcon:
+                              const Icon(Icons.email, color: Colors.green),
                           labelText: 'Email',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty || !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                             return 'Please enter a valid email';
                           }
                           return null;
@@ -187,26 +189,13 @@ class _UserSignupState extends State<UserSignup> {
                       ),
                       const SizedBox(height: 15),
 
-                      // Phone Number Field
-                      // TextFormField(
-                      //   controller: _phoneController,
-                      //   keyboardType: TextInputType.phone,
-                      //   decoration: InputDecoration(
-                      //     prefixIcon: const Icon(Icons.phone, color: Colors.green),
-                      //     labelText: 'Phone Number',
-                      //     border: OutlineInputBorder(
-                      //       borderRadius: BorderRadius.circular(10),
-                      //     ),
-                      //   ),
-                      // ),
-                      // const SizedBox(height: 15),
-
                       // Password Field
                       TextFormField(
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.lock, color: Colors.green),
+                          prefixIcon:
+                              const Icon(Icons.lock, color: Colors.green),
                           labelText: 'Password',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -229,7 +218,8 @@ class _UserSignupState extends State<UserSignup> {
                         controller: _confirmPasswordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.lock, color: Colors.green),
+                          prefixIcon:
+                              const Icon(Icons.lock, color: Colors.green),
                           labelText: 'Confirm Password',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -244,7 +234,7 @@ class _UserSignupState extends State<UserSignup> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Terms and Conditions Checkbox
+                      // Terms and Conditions Checkbox with Clickable Text
                       Row(
                         children: [
                           Checkbox(
@@ -255,15 +245,21 @@ class _UserSignupState extends State<UserSignup> {
                               });
                             },
                           ),
-                          const Expanded(
-                            child: Text(
-                              'I agree to the Terms and Conditions',
-                              style: TextStyle(color: Colors.black54),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: _showTermsAndConditions,
+                              child: const Text(
+                                'I agree to the Terms and Conditions',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
 
                       // Create Account Button
                       ElevatedButton(
@@ -276,8 +272,11 @@ class _UserSignupState extends State<UserSignup> {
                           ),
                         ),
                         child: _isLoading
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : const Text('Create Account', style: TextStyle(fontSize: 16, color: Colors.white)),
+                            ? const CircularProgressIndicator(
+                                color: Colors.white)
+                            : const Text('Create Account',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.white)),
                       ),
                       const SizedBox(height: 10),
 
@@ -293,7 +292,9 @@ class _UserSignupState extends State<UserSignup> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text('Already have an account? Login', style: TextStyle(fontSize: 16, color: Colors.green)),
+                        child: const Text('Already have an account? Login',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.green)),
                       ),
                     ],
                   ),
@@ -302,6 +303,64 @@ class _UserSignupState extends State<UserSignup> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // Function to Show Terms and Conditions Dialog
+  void _showTermsAndConditions() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Terms and Conditions"),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                "By creating an account and using this application, you agree to the following terms and conditions:\n",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                "1. Acceptance of Terms\n"
+                "   By signing up, you acknowledge that you have read, understood, and agreed to comply with these Terms and Conditions.\n\n"
+                "2. User Responsibilities\n"
+                "   - You must provide accurate and complete information during registration.\n"
+                "   - You are responsible for maintaining the confidentiality of your account credentials.\n"
+                "   - Any unauthorized activity on your account is your responsibility, and you must notify us immediately if you suspect a security breach.\n\n"
+                "3. Data Privacy and Security\n"
+                "   - We collect and process your personal data in accordance with our **Privacy Policy**.\n"
+                "   - Your data will be securely stored and will not be shared with third parties without your consent, except as required by law.\n"
+                "   - You have the right to request access, correction, or deletion of your personal data.\n\n"
+                "4. Prohibited Activities\n"
+                "   You agree not to:\n"
+                "   - Use the app for any unlawful purposes.\n"
+                "   - Attempt to hack, modify, or distribute unauthorized copies of the app.\n"
+                "   - Violate the rights of other users, including harassment or fraudulent activity.\n\n"
+                "5. Service Modifications & Termination\n"
+                "   - We reserve the right to modify, suspend, or terminate the app or your access at any time, with or without notice.\n"
+                "   - Continued use of the app after changes to these terms constitutes your acceptance of the updated terms.\n\n"
+                "6. Limitation of Liability\n"
+                "   - We are not liable for any indirect, incidental, or consequential damages arising from your use of the app.\n"
+                "   - We do not guarantee uninterrupted or error-free service.\n\n"
+                "7. Governing Law\n"
+                "   These terms shall be governed by and interpreted in accordance with the applicable laws of your jurisdiction.\n\n"
+                "By clicking 'Agree', you confirm that you have read and accepted these Terms and Conditions.",
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _acceptTerms = true; // Auto-check the checkbox
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("Agree"),
+          ),
+        ],
       ),
     );
   }

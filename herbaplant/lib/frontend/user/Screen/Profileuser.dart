@@ -5,7 +5,6 @@ import '/services/api_service.dart';
 import 'package:herbaplant/main.dart' show navigatorKey;
 
 
-
 class ProfileUserScreen extends StatefulWidget {
   const ProfileUserScreen({super.key});
 
@@ -27,6 +26,8 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
   TextEditingController oldPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController retypePasswordController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   String? _passwordError;
 
   @override
@@ -49,7 +50,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor:  Colors.green.shade700,
         elevation: 0,
         title: const Text('Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -59,7 +60,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
         children: [
           _ProfileSection(username: _username, email: _email), 
 
-          const Divider(height: 20, color: Colors.grey),
+          const Divider(height: 40, color: Colors.grey),
 
           const _SectionHeader(title: 'Profile Management'),
 
@@ -156,126 +157,142 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
   }
 
   // Build Username Change Fields
-  List<Widget> _buildUsernameFields() {
-    TextEditingController usernameController = TextEditingController();
-
-    return [
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextField(
-          controller: usernameController,
-          decoration: const InputDecoration(labelText: "Enter New Username"),
+List<Widget> _buildUsernameFields() {
+  return [
+    _buildExpansionContent([
+      const Text("Enter New Username", style: TextStyle(fontWeight: FontWeight.bold)),
+      const SizedBox(height: 5),
+      TextField(
+        controller: usernameController,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: ElevatedButton(
-          onPressed: () {
-            _updateUserInfo("username", usernameController.text.trim());
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-          child: const Text("Save Username", style: TextStyle(color: Colors.white)),
+      const SizedBox(height: 10),
+      ElevatedButton(
+        onPressed: () {
+          _updateUserInfo("username", usernameController.text.trim());
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          minimumSize: const Size(double.infinity, 45),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
+        child: const Text("Save Username", style: TextStyle(color: Colors.white)),
       ),
-    ];
-  }
+    ]),
+  ];
+}
 
   // Build Email Change Fields
   List<Widget> _buildEmailFields() {
-    TextEditingController emailController = TextEditingController();
-
-    return [
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextField(
-          controller: emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(labelText: "Enter New Email Address"),
+  return [
+    _buildExpansionContent([
+      const Text("Enter New Email Address", style: TextStyle(fontWeight: FontWeight.bold)),
+      const SizedBox(height: 5),
+      TextField(
+        controller: emailController,
+        keyboardType: TextInputType.emailAddress,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.grey[200],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),
-      const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
-        child: Text(
-          "⚠️ You be logged out and will need to verify your new email before logging in again.",
-          style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold),
-        ),
+      const SizedBox(height: 10),
+      const Text(
+        "⚠️ You will be logged out and need to verify your new email before logging in again.",
+        style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: ElevatedButton(
-          onPressed: () {
-            _updateUserInfo("email", emailController.text.trim());
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-          child: const Text("Save Email", style: TextStyle(color: Colors.white)),
+      const SizedBox(height: 10),
+      ElevatedButton(
+        onPressed: () {
+          _updateUserInfo("email", emailController.text.trim());
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          minimumSize: const Size(double.infinity, 45),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
+        child: const Text("Save Email", style: TextStyle(color: Colors.white)),
       ),
-    ];
-  }
+    ]),
+  ];
+}
 
   // Build Password Change Fields
   List<Widget> _buildPasswordFields() {
-      return [
-        _passwordInputField("Old Password", oldPasswordController, _obscureOldPassword, () {
-          setState(() {
-            _obscureOldPassword = !_obscureOldPassword;
-          });
-        }),
-        _passwordInputField("New Password", newPasswordController, _obscureNewPassword, () {
-          setState(() {
-            _obscureNewPassword = !_obscureNewPassword;
-          });
-        }),
-        _passwordInputField("Retype New Password", retypePasswordController, _obscureRetypePassword, () {
-          setState(() {
-            _obscureRetypePassword = !_obscureRetypePassword;
-          });
-        }),
-        if (_passwordError != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: Text(_passwordError!, style: const TextStyle(color: Colors.red, fontSize: 12)),
-          ),
+  return [
+    _buildExpansionContent([
+      _passwordInputField("Old Password", oldPasswordController, _obscureOldPassword, () {
+        setState(() {
+          _obscureOldPassword = !_obscureOldPassword;
+        });
+      }),
+      _passwordInputField("New Password", newPasswordController, _obscureNewPassword, () {
+        setState(() {
+          _obscureNewPassword = !_obscureNewPassword;
+        });
+      }),
+      _passwordInputField("Retype New Password", retypePasswordController, _obscureRetypePassword, () {
+        setState(() {
+          _obscureRetypePassword = !_obscureRetypePassword;
+        });
+      }),
+      if (_passwordError != null)
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: ElevatedButton(
-            onPressed: () {
-              if (newPasswordController.text != retypePasswordController.text) {
-                setState(() {
-                  _passwordError = "  Passwords do not match!";
-                });
-                return;
-              } else {
-                setState(() {
-                  _passwordError = null;
-                });
-              }
-              _updateUserInfo("password", newPasswordController.text.trim());
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: const Text("Save Password", style: TextStyle(color: Colors.white)),
-          ),
+          padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+          child: Text(_passwordError!, style: const TextStyle(color: Colors.red, fontSize: 12)),
         ),
-      ];
-    }
+      const SizedBox(height: 10),
+      ElevatedButton(
+        onPressed: () {
+          if (newPasswordController.text != retypePasswordController.text) {
+            setState(() {
+              _passwordError = "Passwords do not match!";
+            });
+            return;
+          } else {
+            setState(() {
+              _passwordError = null;
+            });
+          }
+          _updateUserInfo("password", newPasswordController.text.trim());
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          minimumSize: const Size(double.infinity, 45),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        child: const Text("Save Password", style: TextStyle(color: Colors.white)),
+      ),
+    ]),
+  ];
+}
 
     Widget _passwordInputField(
-        String label, TextEditingController controller, bool obscureText, VoidCallback toggleVisibility) {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: TextField(
-          controller: controller,
-          obscureText: obscureText,
-          decoration: InputDecoration(
-            labelText: label,
-            suffixIcon: IconButton(
-              icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
-              onPressed: toggleVisibility,
-            ),
-          ),
+    String label, TextEditingController controller, bool obscureText, VoidCallback toggleVisibility) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[200],
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        suffixIcon: IconButton(
+          icon: Icon(obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+          onPressed: toggleVisibility,
         ),
-      );
-    }
+      ),
+    ),
+  );
+}
+
 
     Future<void> _updateUserInfo(String field, String newValue) async {
       if (field == "email") {
@@ -402,16 +419,43 @@ class _ProfileSection extends StatelessWidget {
 
 class _SectionHeader extends StatelessWidget {
   final String title;
-
   const _SectionHeader({required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black54)),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 18,              
+          fontWeight: FontWeight.bold, 
+          color: Colors.black,         
+        ),
+      ),
     );
   }
 }
 
-
+// Styled Container for better UI inside ExpansionTile
+Widget _buildExpansionContent(List<Widget> children) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.1),
+          blurRadius: 5,
+          offset: const Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    ),
+  );
+}
