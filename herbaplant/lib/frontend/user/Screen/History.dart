@@ -42,7 +42,7 @@ class _HistoryState extends State<History> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Search History'),
-        backgroundColor: Colors.green,
+        backgroundColor:  Colors.green.shade700,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -65,9 +65,23 @@ class _HistoryState extends State<History> {
             Expanded(
               child: filteredHistory.isEmpty
                   ? Center(
-                      child: Lottie.asset(
-                        'assets/animations/historyn.json', // Ensure this file exists in assets
-                        repeat: true,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Lottie.asset(
+                            'assets/animations/historyn.json', // Ensure this file exists in assets
+                            repeat: true,
+                          ),
+                          SizedBox(height: 10), // Space between animation and text
+                          Text(
+                            "No History",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
                       ),
                     )
                   : ListView.builder(
@@ -109,7 +123,7 @@ class DetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(plantName),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green.shade700,
       ),
       body: Center(
         child: Text(

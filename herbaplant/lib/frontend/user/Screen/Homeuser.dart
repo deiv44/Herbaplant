@@ -103,7 +103,7 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor:  Colors.green.shade700,
         elevation: 0,
         centerTitle: false,
         title: Text(
