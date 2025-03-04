@@ -41,7 +41,7 @@ class _IdentifyState extends State<Identify> {
     tutorialCoachMark = TutorialCoachMark(
       targets: targets,
       pulseEnable: false,
-      colorShadow: Colors.green,
+      colorShadow: const Color.fromRGBO(76, 175, 80, 1),
       onClickTarget: (target) {
         print(target.identify);
       },
