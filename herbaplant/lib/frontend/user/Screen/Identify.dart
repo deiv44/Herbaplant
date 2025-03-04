@@ -347,44 +347,56 @@ class _IdentifyState extends State<Identify> {
           ),
 
           // Chat input section
-          Container(
-            key: chatkey,
-            color: Colors.white,
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Container(
-                  key: CameraKey,
-                  child: IconButton(
-                    icon: const Icon(Icons.attach_file, color: Colors.green),
-                    onPressed: _showImageSourceDialog,
+          // Chat input section
+            Container(
+              key: chatkey,
+              color: Colors.white,
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  // 📸 Camera Icon (Take Photo)
+                  IconButton(
+                    icon: const Icon(Icons.camera_alt, color: Colors.green),
+                    onPressed: () => _selectMedia(ImageSource.camera),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Type your message...',
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
+
+                  // 🖼️ Gallery Icon (Select from Gallery)
+                  IconButton(
+                    icon: const Icon(Icons.photo_library, color: Colors.green),
+                    onPressed: () => _selectMedia(ImageSource.gallery),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // 📝 Message Input Field
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: InputDecoration(
+                        hintText: 'Type your message...',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
+                      style: const TextStyle(color: Colors.black),
                     ),
-                    style: const TextStyle(color: Colors.black),
                   ),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: _sendMessage,
-                  icon: const Icon(Icons.send, color: Colors.green, size: 28),
-                ),
-              ],
+
+                  const SizedBox(width: 8),
+
+                  // 📩 Send Button
+                  IconButton(
+                    onPressed: _sendMessage,
+                    icon: const Icon(Icons.send, color: Colors.green, size: 28),
+                  ),
+                ],
+              ),
             ),
-          ),
+
         ],
       ),
     );
