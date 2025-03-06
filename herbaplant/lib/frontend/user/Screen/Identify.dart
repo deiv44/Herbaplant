@@ -347,56 +347,41 @@ class _IdentifyState extends State<Identify> {
           ),
 
           // Chat input section
-          // Chat input section
-            Container(
-              key: chatkey,
-              color: Colors.white,
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  // 📸 Camera Icon (Take Photo)
-                  IconButton(
-                    icon: const Icon(Icons.camera_alt, color: Colors.green),
-                    onPressed: () => _selectMedia(ImageSource.camera),
-                  ),
 
-                  // 🖼️ Gallery Icon (Select from Gallery)
-                  IconButton(
-                    icon: const Icon(Icons.photo_library, color: Colors.green),
-                    onPressed: () => _selectMedia(ImageSource.gallery),
-                  ),
-
-                  const SizedBox(width: 8),
-
-                  // 📝 Message Input Field
-                  Expanded(
-                    child: TextField(
-                      controller: messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Type your message...',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
+              Container(
+                key: chatkey,
+                color: Colors.white,
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center, // Center align icons
+                  children: [
+                
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle, 
+                        border: Border.all(color: Colors.green, width: 3), 
                       ),
-                      style: const TextStyle(color: Colors.black),
+                      child: IconButton(
+                        icon: const Icon(Icons.camera_alt, color: Colors.green, size: 36), 
+                        onPressed: () => _selectMedia(ImageSource.camera),
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(width: 8),
+                    const SizedBox(width: 32), 
 
-                  // 📩 Send Button
-                  IconButton(
-                    onPressed: _sendMessage,
-                    icon: const Icon(Icons.send, color: Colors.green, size: 28),
-                  ),
-                ],
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle, 
+                        border: Border.all(color: Colors.green, width: 3), 
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.photo_library, color: Colors.green, size: 36),
+                        onPressed: () => _selectMedia(ImageSource.gallery),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-
         ],
       ),
     );
