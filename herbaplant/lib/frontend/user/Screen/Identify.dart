@@ -403,8 +403,6 @@ class _IdentifyState extends State<Identify> {
               ),
             ),
           ),
-
-          // Chat input section
           // Chat input section
             Container(
               key: chatkey,
@@ -534,7 +532,6 @@ class _CoachMarkDescState extends State<CoachMarkDesc>
             ),
           ],
         ),
-      
       ),
     );
   }
