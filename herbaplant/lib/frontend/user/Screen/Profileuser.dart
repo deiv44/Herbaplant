@@ -50,11 +50,44 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:  Colors.green.shade700,
+        backgroundColor: Colors.green.shade700,
         elevation: 0,
-        title: const Text('Profile', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Profile',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white), // ✅ White Logout Icon
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: const Text('Confirm Logout'),
+                    content: const Text('Are you sure you want to log out?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancel', style: TextStyle(color: Colors.green)),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _logout();
+                        },
+                        child: const Text('Logout', style: TextStyle(color: Colors.red)),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ],
       ),
+
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -117,40 +150,40 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
 
           const Divider(height: 20, color: Colors.grey),
 
-          Center(
-            child: TextButton.icon(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                foregroundColor: Colors.red,
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Confirm Logout'),
-                      content: const Text('Are you sure you want to log out?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Cancel', style: TextStyle(color: Colors.green)),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            _logout();
-                          },
-                          child: const Text('Logout', style: TextStyle(color: Colors.red)),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              icon: const Icon(Icons.logout),
-              label: const Text('Logout'),
-            ),
-          ),
+          // Center(
+          //   child: TextButton.icon(
+          //     style: TextButton.styleFrom(
+          //       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          //       foregroundColor: Colors.red,
+          //     ),
+          //     onPressed: () {
+          //       showDialog(
+          //         context: context,
+          //         builder: (BuildContext context) {
+          //           return AlertDialog(
+          //             title: const Text('Confirm Logout'),
+          //             content: const Text('Are you sure you want to log out?'),
+          //             actions: [
+          //               TextButton(
+          //                 onPressed: () => Navigator.of(context).pop(),
+          //                 child: const Text('Cancel', style: TextStyle(color: Colors.green)),
+          //               ),
+          //               TextButton(
+          //                 onPressed: () {
+          //                   Navigator.of(context).pop();
+          //                   _logout();
+          //                 },
+          //                 child: const Text('Logout', style: TextStyle(color: Colors.red)),
+          //               ),
+          //             ],
+          //           );
+          //         },
+          //       );
+          //     },
+          //     icon: const Icon(Icons.logout),
+          //     label: const Text('Logout'),
+          //   ),
+          // ),
         ],
       ),
     );

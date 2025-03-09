@@ -4,6 +4,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import '/services/api_service.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'dart:math';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+
 
 class Identify extends StatefulWidget {
   const Identify({super.key});
@@ -29,6 +34,19 @@ class _IdentifyState extends State<Identify> {
   GlobalKey chatkey = GlobalKey();
   GlobalKey CameraKey = GlobalKey();
   GlobalKey Chatboxkey = GlobalKey();
+
+  Widget formatMessage(String message) {
+    return MarkdownBody(
+      data: message,
+      styleSheet: MarkdownStyleSheet(
+        p: TextStyle(fontSize: 16, color: Colors.black),
+        strong: TextStyle(fontWeight: FontWeight.bold), // **bold**
+        em: TextStyle(fontStyle: FontStyle.italic), // *italic*
+      ),
+    );
+  }
+
+
 
   @override
   void initState() {
@@ -176,59 +194,92 @@ class _IdentifyState extends State<Identify> {
   }
 
   Future<void> _predictImage(File image) async {
+  setState(() {
+    _isLoading = true;
+    _hasUserInteracted = true;
+  });
+
+  try {
+    Map<String, dynamic>? result = await ApiService.predictPlant(image);
+    print("API Response: $result");
+
+    if (result == null || result.containsKey("error")) {
+      setState(() {
+        messages.add({
+          'type': 'text',
+          'content': "Prediction failed: ${result?['error'] ?? 'Unknown error'}"
+        });
+      });
+      return;
+    }
+
+    // Extract plant details with default fallbacks
+    String plantName = result['common_name']?.toString() ?? "an unknown plant";
+    String scientificName = result['scientific_name']?.toString() ?? "Unknown Scientific Name";
+    String localNames = result['local_names']?.toString() ?? "N/A";
+    String leafShape = result['leaf_shape']?.toString() ?? "Unknown";
+    String flowerColor = result['flower_color']?.toString() ?? "Unknown";
+    String plantHeight = result['plant_height']?.toString() ?? "Unknown";
+    String growthHabit = result['growth_habit']?.toString() ?? "Unknown";
+    String distinctiveFeatures = result['distinctive_features']?.toString() ?? "No distinctive features";
+    String nativeRegion = result['native_region']?.toString() ?? "Unknown region";
+    String habitat = result['habitat']?.toString() ?? "Unknown habitat";
+    String climatePreference = result['climate_preference']?.toString() ?? "Unknown climate preference";
+    String soilType = result['soil_type']?.toString() ?? "Unknown soil type";
+    String sunlightRequirement = result['sunlight_requirement']?.toString() ?? "Unknown sunlight requirement";
+    String medicinalUses = result['medicinal_uses']?.toString() ?? "No known medicinal uses.";
+
+    // Define 10 different description styles
+    List<String> templates = [
+      "**$plantName**, scientifically known as ***$scientificName***, features $leafShape leaves and exquisite $flowerColor flowers. Typically growing up to $plantHeight, it is distinguished by $distinctiveFeatures. This plant is commonly found in $habitat and thrives in $soilType under $sunlightRequirement conditions.",
+
+      "Introducing **$plantName** (***$scientificName***), a plant recognized for its $distinctiveFeatures. It naturally flourishes in $habitat, particularly in $climatePreference environments. Its $flowerColor flowers and $leafShape leaves contribute to its unique appearance.",
+
+      "The plant you have identified is **$plantName**, botanically classified as ***$scientificName***. With a $growthHabit growth habit, it can reach a height of $plantHeight. It is primarily found in $nativeRegion and is noted for $distinctiveFeatures.",
+
+      "**$plantName** is a remarkable species with $flowerColor flowers and $leafShape leaves. Commonly found in $habitat, it thrives in $climatePreference conditions. In traditional medicine, it is valued for its medicinal benefits, particularly for $medicinalUses.",
+
+      "Ah! You’ve identified **$plantName**, known scientifically as ***$scientificName***. It is predominantly found in $nativeRegion, where it grows as a $growthHabit plant. This species is recognized for $distinctiveFeatures and is widely utilized for $medicinalUses.",
+
+      "**$plantName** (***$scientificName***) is a well-documented species featuring $flowerColor flowers and a distinctive $growthHabit growth pattern. It flourishes in $soilType and is most commonly observed in $habitat.",
+
+      "You have identified **$plantName**, an exceptional plant known for $distinctiveFeatures and striking $flowerColor blossoms. Preferring $climatePreference conditions, it requires $sunlightRequirement for optimal development.",
+
+      "**$plantName**, classified as ***$scientificName***, is indigenous to $nativeRegion, where it thrives in $habitat. With $leafShape leaves and a maximum height of $plantHeight, it adapts well to $soilType and is valued for $medicinalUses.",
+
+      "The plant in question is **$plantName**, a species belonging to ***$scientificName***. Adapted to $climatePreference climates, it produces $flowerColor flowers and is distinguished by $distinctiveFeatures, making it easily recognizable.",
+
+      "This is **$plantName**, also referred to as '$localNames'. Predominantly found in $habitat, it is scientifically classified as ***$scientificName***. It thrives in $climatePreference conditions, requiring $sunlightRequirement exposure for healthy growth."
+  ];
+
+    // Pick a random template
+    Random random = Random();
+    String randomDescription = templates[random.nextInt(templates.length)];
+    
+    String formatResponse(String text) {
+      return text.replaceAllMapped(RegExp(r'([.!?]) '), (match) => "${match.group(1)}\n\n");
+    }
+
+
     setState(() {
-      _isLoading = true;
-      _hasUserInteracted = true;
+      messages.add({'type': 'text', 'content': formatResponse(randomDescription)});
     });
 
-      try {
-        Map<String, dynamic>? result = await ApiService.predictPlant(image);
-        print("API Response: $result"); // Debugging
 
-        if (result == null || result.containsKey("error")) {
-          setState(() {
-            messages.add({
-              'type': 'text',
-              'content': "Prediction failed: ${result?['error'] ?? 'Unknown error'}"
-            });
-          });
-          return;
-        }
 
-        String plantName = result['common_name']?.toString() ?? "Unknown Plant"; 
-        String scientificName = result['scientific_name']?.toString() ?? "Unknown Scientific Name";
-        double confidenceValue = double.tryParse(result['confidence']?.replaceAll("%", "") ?? "0") ?? 0.0; 
-        String confidence = "${confidenceValue.toStringAsFixed(2)}%";
-
-        String formattedMessage = """
-          **Detected Plant:**  
-          $plantName  
-
-          **Scientific Name:**  
-          $scientificName  
-
-          **Confidence:**  
-          $confidence  
-          """;
-
-          setState(() {
-            _result = plantName;
-            messages.add({'type': 'text', 'content': formattedMessage});
-          });
-
-      } catch (e) {
-          print("⚠️ Error during prediction: $e");
-          setState(() {
-            messages.add({'type': 'text', 'content': "Prediction failed. Try again."});
-          });
-        } finally {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-
-    _scrollToBottom();
+  } catch (e) {
+    print(" Error during prediction: $e");
+    setState(() {
+      messages.add({'type': 'text', 'content': "Prediction failed. Try again."});
+    });
+  } finally {
+    setState(() {
+      _isLoading = false;
+    });
   }
+
+  _scrollToBottom();
+}
 
 
   void _sendMessage() {
@@ -288,20 +339,23 @@ class _IdentifyState extends State<Identify> {
 
             const SizedBox(height: 8),
             const Text(
-              "Identify Herbal Plant in your local area!",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
+                "Identify Herbal Plants\nby Taking or Uploading a Photo!",
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+                textAlign: TextAlign.center,
+              ),
+
             const SizedBox(height: 12),
             Lottie.asset("assets/animations/scanplanta.json",
                 width: 200, height: 200),
-            const SizedBox(height: 20),
+                const SizedBox(height: 20),
           ],
 
           // Chat messages
           Container(
             key: Chatboxkey ,
             child: Expanded(
-              child: ListView.builder(
+              child: 
+              ListView.builder(
                 controller: _scrollController,
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
@@ -324,20 +378,24 @@ class _IdentifyState extends State<Identify> {
                           maxWidth: MediaQuery.of(context).size.width * 0.75,
                         ),
                         child: message['type'] == 'text'
-                            ? Text(
-                                message['content'],
-                                style: const TextStyle(
-                                    color: Colors.black, fontSize: 16),
-                              )
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.file(
-                                  File(message['content']),
-                                  width: 200,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                ),
+                          ? MarkdownBody(
+                              data: message['content'], // ✅ Now supports bold & italic!
+                              styleSheet: MarkdownStyleSheet(
+                                p: TextStyle(fontSize: 16, color: Colors.black),
+                                strong: TextStyle(fontWeight: FontWeight.bold), // **bold**
+                                em: TextStyle(fontStyle: FontStyle.italic), // *italic*
                               ),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(
+                                File(message['content']),
+                                width: 200,
+                                height: 200,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+
                       ),
                     ),
                   );
@@ -352,51 +410,45 @@ class _IdentifyState extends State<Identify> {
               key: chatkey,
               color: Colors.white,
               padding: const EdgeInsets.all(16.0),
-              child: Row(
+              child: Column(
                 children: [
-                  // 📸 Camera Icon (Take Photo)
-                  IconButton(
-                    icon: const Icon(Icons.camera_alt, color: Colors.green),
-                    onPressed: () => _selectMedia(ImageSource.camera),
-                  ),
-
-                  // 🖼️ Gallery Icon (Select from Gallery)
-                  IconButton(
-                    icon: const Icon(Icons.photo_library, color: Colors.green),
-                    onPressed: () => _selectMedia(ImageSource.gallery),
-                  ),
-
-                  const SizedBox(width: 8),
-
-                  // 📝 Message Input Field
-                  Expanded(
-                    child: TextField(
-                      controller: messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Type your message...',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center, // ✅ Center buttons
+                    children: [
+                      Column(
+                        children: [
+                          // 📸 Camera Icon (Take Photo)
+                          IconButton(
+                            icon: const Icon(Icons.camera_alt_rounded, color: Colors.green, size: 50), // ✅ New icon
+                            onPressed: () => _selectMedia(ImageSource.camera),
+                          ),
+                          const SizedBox(height: 5),
+                          const Text(
+                            "Take a Photo",
+                            style: TextStyle(fontSize: 14, color: Colors.black),
+                          ),
+                        ],
                       ),
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
-
-                  const SizedBox(width: 8),
-
-                  // 📩 Send Button
-                  IconButton(
-                    onPressed: _sendMessage,
-                    icon: const Icon(Icons.send, color: Colors.green, size: 28),
+                      const SizedBox(width: 40), // Space between buttons
+                      Column(
+                        children: [
+                          // 🖼️ Upload Icon (Upload Photo)
+                          IconButton(
+                            icon: const Icon(Icons.upload_file_rounded, color: Colors.green, size: 50), // ✅ New icon
+                            onPressed: () => _selectMedia(ImageSource.gallery),
+                          ),
+                          const SizedBox(height: 5),
+                          const Text(
+                            "Upload a Photo",
+                            style: TextStyle(fontSize: 14, color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-
         ],
       ),
     );

@@ -251,32 +251,32 @@ class _UserSigninState extends State<UserSignin> {
                             const SizedBox(height: 18),
 
                             // Resend Verification Email Button
-                            ElevatedButton(
-                              onPressed: () async {
-                                bool success = await ApiService.sendVerificationEmail();
-                                if (success) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text("📧 Verification email sent! Check your inbox."),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text("⚠️ Failed to resend verification email."),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              child: Text("Resend Verification Email", style: TextStyle(color: Colors.white)),
-                            ),
+                            // ElevatedButton(
+                            //   onPressed: () async {
+                            //     bool success = await ApiService.sendVerificationEmail();
+                            //     if (success) {
+                            //       ScaffoldMessenger.of(context).showSnackBar(
+                            //         SnackBar(
+                            //           content: Text("📧 Verification email sent! Check your inbox."),
+                            //           backgroundColor: Colors.green,
+                            //         ),
+                            //       );
+                            //     } else {
+                            //       ScaffoldMessenger.of(context).showSnackBar(
+                            //         SnackBar(
+                            //           content: Text("⚠️ Failed to resend verification email."),
+                            //           backgroundColor: Colors.red,
+                            //         ),
+                            //       );
+                            //     }
+                            //   },
+                            //   style: ElevatedButton.styleFrom(
+                            //     backgroundColor: Colors.green,
+                            //     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                            //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            //   ),
+                            //   child: Text("Resend Verification Email", style: TextStyle(color: Colors.white)),
+                            // ),
 
 
                             Row(

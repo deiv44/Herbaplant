@@ -81,10 +81,12 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
 
     void _fetchTrendingNews() async {
       List<dynamic> fetchedNews = await ApiService.fetchTrendingNews();
+
       setState(() {
         trendingNews = fetchedNews;
       });
     }
+
 
     void _openNewsArticle(String url) async {
       final Uri uri = Uri.parse(url);
@@ -189,8 +191,40 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
                                       width: 250,
                                       height: 150,
                                       fit: BoxFit.cover,
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                                                : null,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          width: 250,
+                                          height: 150,
+                                          color: Colors.grey[300],
+                                          child: Center(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                const Icon(Icons.broken_image, color: Colors.red, size: 40),
+                                                const SizedBox(height: 5),
+                                                const Text(
+                                                  "Image failed to load",
+                                                  style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
+
+
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
