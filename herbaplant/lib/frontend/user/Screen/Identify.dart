@@ -349,39 +349,62 @@ class _IdentifyState extends State<Identify> {
           // Chat input section
 
               Container(
-                key: chatkey,
-                color: Colors.white,
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center, // Center align icons
-                  children: [
-                
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle, 
-                        border: Border.all(color: Colors.green, width: 3), 
+            key: chatkey,
+            color: Colors.white,
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center, 
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white, 
+                    borderRadius: BorderRadius.circular(25), 
+                    border: Border.all(color: Colors.green, width: 4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 1,
+                        offset: Offset(2, 2),
                       ),
-                      child: IconButton(
-                        icon: const Icon(Icons.camera_alt, color: Colors.green, size: 36), 
-                        onPressed: () => _selectMedia(ImageSource.camera),
-                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    child: IconButton(
+                      icon: const Icon(Icons.camera_alt,
+                          color: Colors.green, size: 36),
+                      onPressed: () => _selectMedia(ImageSource.camera),
                     ),
-
-                    const SizedBox(width: 32), 
-
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle, 
-                        border: Border.all(color: Colors.green, width: 3), 
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.photo_library, color: Colors.green, size: 36),
-                        onPressed: () => _selectMedia(ImageSource.gallery),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(width: 32),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white, 
+                    borderRadius: BorderRadius.circular(30), 
+                    border: Border.all(color: Colors.green, width: 4),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5,
+                        offset: Offset(2, 2),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8), 
+                    child: IconButton(
+                      icon: const Icon(Icons.photo_library,
+                          color: Colors.green, size: 36),
+                      onPressed: () => _selectMedia(ImageSource.gallery),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
