@@ -48,7 +48,7 @@ class MainNavigationState extends State<MainNavigation> {
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.camera_alt_rounded),
+            icon: Icon(Icons.camera_enhance_rounded),
             label: '',
           ),
           BottomNavigationBarItem(

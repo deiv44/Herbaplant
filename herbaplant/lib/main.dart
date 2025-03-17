@@ -100,7 +100,8 @@ void _handleDeepLink(Uri uri) {
   } else if (uri.path == "/verification-failed") {
     _showVerificationDialog("Verification Failed", "The verification link is invalid or expired.");
   } else if (uri.path == "/verification-expired") {
-    _showVerificationDialog("⚠️ Verification Expired", "The verification link has expired. Please try again.");
+    // expired link
+    _showVerificationDialog(" Verification Expired", "The verification link has expired. Please try again.");
   }
 }
 

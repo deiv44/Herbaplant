@@ -35,11 +35,11 @@ class ApiService {
         final data = jsonDecode(response.body);
         return data["first_time_login"] ?? false;
       } else {
-        print("⚠️ Failed to fetch user info: ${response.body}");
+        print(" Failed to fetch user info: ${response.body}");
         return false;
       }
     } catch (e) {
-      print("⚠️ Network error: $e");
+      print(" Network error: $e");
       return false;
     }
   }
@@ -149,7 +149,7 @@ class ApiService {
     String? token = prefs.getString("token");
 
     if (token == null) {
-      print("⚠️ No token found");
+      print(" No token found");
       return;
     }
 
@@ -174,38 +174,109 @@ class ApiService {
         print("Failed to save search history: ${response.body}");
       }
     } catch (e) {
-      print("⚠️ Network error: $e");
+      print(" Network error: $e");
     }
   }
 
 // Fetch Search History
   static Future<List<Map<String, dynamic>>> fetchSearchHistory() async {
+  final prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString("token");
+
+  if (token == null) {
+    print(" No token found");
+    return [];
+  }
+
+  final url = Uri.parse("$baseUrl/plant/search-history/get");
+
+  try {
+    final response = await http.get(url, headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json"
+    });
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+
+      // Ensure each entry has an "id"
+      List<Map<String, dynamic>> history = List<Map<String, dynamic>>.from(data);
+      for (var entry in history) {
+        if (!entry.containsKey("id")) {
+          entry["id"] = null; // Prevents crashes
+        }
+      }
+
+      return history;
+    } else {
+      print(" Failed to fetch history: ${response.body}");
+      return [];
+    }
+  } catch (e) {
+    print(" Network error: $e");
+    return [];
+  }
+}
+
+  // Delete all search history
+  static Future<bool> clearSearchHistory() async {
     final prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString("token");
 
     if (token == null) {
-      print("⚠️ No token found");
-      return [];
+      print(" No token found");
+      return false;
     }
 
-    final url = Uri.parse("$baseUrl/plant/search-history/get");
+    final url = Uri.parse("$baseUrl/plant/search-history/delete/all");
 
     try {
-      final response = await http.get(url, headers: {
+      final response = await http.delete(url, headers: {
         "Authorization": "Bearer $token",
         "Content-Type": "application/json"
       });
 
       if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(response.body);
-        return List<Map<String, dynamic>>.from(data);
+        print(" Search history cleared!");
+        return true;
       } else {
-        print("⚠️ Failed to fetch history: ${response.body}");
-        return [];
+        print(" Failed to clear history: ${response.body}");
+        return false;
       }
     } catch (e) {
-      print("⚠️ Network error: $e");
-      return [];
+      print(" Network error: $e");
+      return false;
+    }
+  }
+
+  // Delete a single search history entry
+  static Future<bool> deleteSearchHistory(int historyId) async {
+    final prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString("token");
+
+    if (token == null) {
+      print(" No token found");
+      return false;
+    }
+
+    final url = Uri.parse("$baseUrl/plant/search-history/delete/$historyId");
+
+    try {
+      final response = await http.delete(url, headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json"
+      });
+
+      if (response.statusCode == 200) {
+        print(" Entry deleted successfully!");
+        return true;
+      } else {
+        print(" Failed to delete entry: ${response.body}");
+        return false;
+      }
+    } catch (e) {
+      print(" Network error: $e");
+      return false;
     }
   }
 
@@ -254,7 +325,7 @@ class ApiService {
         return error;
       }
     } catch (e) {
-      return "⚠️ Network error: $e";
+      return " Network error: $e";
     }
   }
 
