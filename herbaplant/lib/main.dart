@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:herbaplant/frontend/Auth/UserSignin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'frontend/user/Screen/main_navigation.dart';
+import 'frontend/user/Screen/onboarding.dart';
 import 'splash_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'frontend/Auth/Forgotpass.dart';
@@ -12,39 +13,55 @@ import 'dart:async';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  _initDeepLink();
-  
-  runApp(const MyApp());
-}
+// GoRouter Configuration
+final GoRouter _router = GoRouter(
+  navigatorKey: navigatorKey,
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const UserSignin(),
+    ),
+    GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/reset-password',
+      builder: (context, state) {
+        final token = state.uri.queryParameters['token'] ?? '';
+        return ResetPasswordScreen(token: token);
+      },
+    ),
+    GoRoute(
+      path: '/check-email',
+      builder: (context, state) => const CheckEmailScreen(),
+    ),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
+    GoRoute(
+      path: '/home',
+      builder: (context, state) => const MainNavigation(),
+    ),
+  ],
+);
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String? token;
+  final bool hasSeenOnboarding;
+  
+  const MyApp({super.key, required this.token, required this.hasSeenOnboarding});
 
   @override
   Widget build(BuildContext context) {
-    final GoRouter router = GoRouter(
-      navigatorKey: navigatorKey,
-      initialLocation: '/home', // Always start at Home
-      routes: [
-        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
-        GoRoute(path: '/login', builder: (context, state) => const UserSignin()),
-        GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordScreen()),
-        GoRoute(
-          path: '/reset-password',
-          builder: (context, state) {
-            final token = state.uri.queryParameters['token'] ?? '';
-            return ResetPasswordScreen(token: token);
-          },
-        ),
-        GoRoute(path: '/check-email', builder: (context, state) => const CheckEmailScreen()),
-        GoRoute(path: '/home', builder: (context, state) => const MainNavigation()), // Home screen as default
-      ],
-    );
-
     return MaterialApp.router(
-      routerConfig: router,
+      routerConfig: _router,
       title: 'Herbal App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -60,6 +77,17 @@ class MyApp extends StatelessWidget {
   }
 }
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  _initDeepLink();
+  final prefs = await SharedPreferences.getInstance();
+
+  bool hasSeenOnboarding = prefs.getBool("onboarding_seen") ?? false;
+  String? token = prefs.getString("token");
+
+  runApp(MyApp(token: token, hasSeenOnboarding: hasSeenOnboarding));
+}
+
 // Initialize Deep Linking
 StreamSubscription<Uri?>? _sub;
 
@@ -73,15 +101,15 @@ void _initDeepLink() async {
     }
 
     _sub = appLinks.uriLinkStream.listen((Uri? link) {
-      if (link != null) {
+      if (link !=null) {
         _handleDeepLink(link);
       }
     }, onError: (err) {
       debugPrint("Deep link error: $err");
     });
-  } catch (e) {
-    debugPrint("Deep link initialization failed: $e");
-  }
+    } catch (e) {
+      debugPrint("Deep link initialization failed: $e");
+    }
 }
 
 void disposeDeepLinkListener() {
@@ -96,9 +124,11 @@ void _handleDeepLink(Uri uri) {
       GoRouter.of(navigatorKey.currentContext!).go('/reset-password?token=$token');
     }
   } else if (uri.path == "/verification-success") {
-    _showVerificationDialog("Email Verified!", "Your email has been successfully verified.");
+    // successful email verification
+    _showVerificationDialog("  Email Verified!", "Your email has been successfully verified.");
   } else if (uri.path == "/verification-failed") {
-    _showVerificationDialog("Verification Failed", "The verification link is invalid or expired.");
+    // failure
+    _showVerificationDialog("  Verification Failed", "The verification link is invalid or expired.");
   } else if (uri.path == "/verification-expired") {
     // expired link
     _showVerificationDialog(" Verification Expired", "The verification link has expired. Please try again.");
