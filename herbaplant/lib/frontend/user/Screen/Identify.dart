@@ -413,40 +413,57 @@ class _IdentifyState extends State<Identify> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center, // ✅ Center buttons
                     children: [
-                      Column(
-                        children: [
-                          // 📸 Camera Icon (Take Photo)
-                          IconButton(
-                            icon: const Icon(Icons.camera_alt_rounded, color: Colors.green, size: 50), // ✅ New icon
-                            onPressed: () => _selectMedia(ImageSource.camera),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            "Take a Photo",
-                            style: TextStyle(fontSize: 14, color: Colors.black),
-                          ),
-                        ],
+                      // 📸 Take Photo Button
+                      GestureDetector(
+                        onTap: () => _selectMedia(ImageSource.camera),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1), // Light green background
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.green, width: 2),
+                              ),
+                              child: const Icon(Icons.camera_alt_rounded, color: Colors.green, size: 36),
+                            ),
+                            const SizedBox(height: 5),
+                            const Text(
+                              "Take a Photo",
+                              style: TextStyle(fontSize: 14, color: Colors.black),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(width: 40), // Space between buttons
-                      Column(
-                        children: [
-                          // 🖼️ Upload Icon (Upload Photo)
-                          IconButton(
-                            icon: const Icon(Icons.upload_file_rounded, color: Colors.green, size: 50), // ✅ New icon
-                            onPressed: () => _selectMedia(ImageSource.gallery),
-                          ),
-                          const SizedBox(height: 5),
-                          const Text(
-                            "Upload a Photo",
-                            style: TextStyle(fontSize: 14, color: Colors.black),
-                          ),
-                        ],
+
+                      // 🖼️ Upload Photo Button
+                      GestureDetector(
+                        onTap: () => _selectMedia(ImageSource.gallery),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1), // Light green background
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.green, width: 2),
+                              ),
+                              child: const Icon(Icons.upload_file_rounded, color: Colors.green, size: 36),
+                            ),
+                            const SizedBox(height: 5),
+                            const Text(
+                              "Upload a Photo",
+                              style: TextStyle(fontSize: 14, color: Colors.black),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
+            )
         ],
       ),
     );
