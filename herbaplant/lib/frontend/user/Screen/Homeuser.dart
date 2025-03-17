@@ -9,6 +9,8 @@ import 'dart:convert';
 
 import 'package:url_launcher/url_launcher.dart';
 
+import 'notification_service.dart';
+
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
 
@@ -80,12 +82,24 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
   List<dynamic> trendingNews = [];
 
     void _fetchTrendingNews() async {
-      List<dynamic> fetchedNews = await ApiService.fetchTrendingNews();
+  List<dynamic> fetchedNews = await ApiService.fetchTrendingNews();
 
-      setState(() {
-        trendingNews = fetchedNews;
-      });
+  if (fetchedNews.isNotEmpty) {
+    // Check if new news is available
+    if (trendingNews.isEmpty || fetchedNews.first["title"] != trendingNews.first["title"]) {
+      // Show notification for new trending news
+      NotificationService.showNotification(
+        "New Trending News!",
+        fetchedNews.first["title"],
+      );
     }
+  }
+
+  setState(() {
+    trendingNews = fetchedNews;
+  });
+}
+
 
 
     void _openNewsArticle(String url) async {
@@ -136,24 +150,6 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Padding(
-            //   padding: const EdgeInsets.all(16.0),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       Expanded(
-            //         child: Row(
-            //           mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //           children: [
-            //             _featureBox(context, Icons.camera_alt_rounded, 'Identify', 1),
-            //             _featureBox(context, Icons.history, 'History', 2),
-            //             _featureBox(context, Icons.person, 'Profile', 3),
-            //           ],
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
