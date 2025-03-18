@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:herbaplant/services/api_service.dart';
 import 'main_navigation.dart';
 import 'package:lottie/lottie.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
