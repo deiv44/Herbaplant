@@ -34,6 +34,18 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
     void initState() {
       super.initState();
       _fetchUserInfo();
+      _loadNotificationPreference();
+    }
+    void _loadNotificationPreference() async {
+      final prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _pushNotifications = prefs.getBool('push_notifications') ?? true;
+      });
+    }
+
+    void _saveNotificationPreference(bool value) async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('push_notifications', value);
     }
 
     void _fetchUserInfo() async {
@@ -145,8 +157,10 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
               setState(() {
                 _pushNotifications = value;
               });
+              _saveNotificationPreference(value);
             },
           ),
+
 
           const Divider(height: 20, color: Colors.grey),
 
@@ -492,3 +506,6 @@ Widget _buildExpansionContent(List<Widget> children) {
     ),
   );
 }
+
+
+

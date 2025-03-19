@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:herbaplant/services/api_service.dart';
 import 'main_navigation.dart';
 import 'package:lottie/lottie.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:url_launcher/url_launcher.dart';
+
+import 'notification_service.dart';
 
 class HomeUser extends StatefulWidget {
   const HomeUser({super.key});
@@ -38,6 +39,8 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
 
     // Fetch trending news
     _fetchTrendingNews();
+
+     _sendNotificationOnce();
   }
 
 
@@ -80,12 +83,56 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
   List<dynamic> trendingNews = [];
 
     void _fetchTrendingNews() async {
-      List<dynamic> fetchedNews = await ApiService.fetchTrendingNews();
+  List<dynamic> fetchedNews = await ApiService.fetchTrendingNews();
 
-      setState(() {
-        trendingNews = fetchedNews;
-      });
+  if (fetchedNews.isNotEmpty) {
+    // Check if new news is available
+    if (trendingNews.isEmpty || fetchedNews.first["title"] != trendingNews.first["title"]) {
+      // Show notification for new trending news
+      NotificationService.showNotification(
+        "New Trending News!",
+        fetchedNews.first["title"],
+      );
     }
+  }
+
+  setState(() {
+    trendingNews = fetchedNews;
+  });
+}
+
+void _sendNotificationOnce() async {
+  final prefs = await SharedPreferences.getInstance();
+  bool hasNotified = prefs.getBool('has_notified') ?? false;
+
+  if (!hasNotified) {
+    await NotificationService.showNotification(
+        "Welcome!", "You have entered Home User.");
+
+    // Mark notification as sent
+    await prefs.setBool('has_notified', true);
+  }
+}
+
+  // void _sendNotificationOncePerDay() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   String today = DateTime.now().toString().split(' ')[0]; // Get today's date as "YYYY-MM-DD"
+
+  //   String? lastNotifiedDate = prefs.getString('last_notified_date');
+
+  //   if (lastNotifiedDate != today) {
+  //     // Send notification if it hasn't been sent today
+  //     await NotificationService.showNotification(
+  //       "Welcome!", "You have entered Home User today."
+  //     );
+
+  //     // Save today's date as the last notified date
+  //     await prefs.setString('last_notified_date', today);
+  //   }
+  // }
+
+
+
 
 
     void _openNewsArticle(String url) async {
@@ -136,24 +183,6 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Padding(
-            //   padding: const EdgeInsets.all(16.0),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       Expanded(
-            //         child: Row(
-            //           mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //           children: [
-            //             _featureBox(context, Icons.camera_alt_rounded, 'Identify', 1),
-            //             _featureBox(context, Icons.history, 'History', 2),
-            //             _featureBox(context, Icons.person, 'Profile', 3),
-            //           ],
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Text(
