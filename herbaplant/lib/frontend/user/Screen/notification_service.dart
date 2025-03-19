@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 class NotificationService {
@@ -6,52 +7,54 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> initialize() async {
-    // Define Android settings
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/notification_icon'); // Change from @mipmap/ic_launcher
+        AndroidInitializationSettings('@drawable/notification_icon');
 
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    await _notificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        debugPrint('Notification clicked: ${response.payload}');
-      },
+    final InitializationSettings initializationSettings = InitializationSettings(
+      android: initializationSettingsAndroid,
     );
 
-    // Request permissions for Android 13+
-    await _requestPermissions();
+    await _notificationsPlugin.initialize(initializationSettings);
+
+    // Request permission for Android 13+
+    await requestPermission();
   }
 
-  static Future<void> _requestPermissions() async {
-    final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+  static Future<void> requestPermission() async {
+    final AndroidFlutterLocalNotificationsPlugin? androidPlugin =
         _notificationsPlugin.resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
 
-    if (androidImplementation != null) {
-      await androidImplementation.requestNotificationsPermission();
+    if (androidPlugin != null) {
+      await androidPlugin.requestNotificationsPermission();
     }
   }
 
   static Future<void> showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'channel_id',
+    final prefs = await SharedPreferences.getInstance();
+    bool isNotificationEnabled = prefs.getBool('push_notifications') ?? true;
+
+    if (!isNotificationEnabled) {
+      return; // Exit early if notifications are disabled
+    }
+
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'channel_id', // Unique ID for your channel
       'channel_name',
-      channelDescription: 'This channel is used for important notifications',
-      importance: Importance.high,
+      channelDescription: 'Your notification channel description',
+      importance: Importance.max,
       priority: Priority.high,
-      ticker: 'ticker',
     );
 
-    const NotificationDetails platformDetails =
-        NotificationDetails(android: androidDetails);
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await _notificationsPlugin.show(
       0, // Notification ID
       title,
       body,
-      platformDetails,
+      platformChannelSpecifics,
     );
   }
 }
