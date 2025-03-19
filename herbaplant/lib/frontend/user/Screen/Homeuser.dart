@@ -39,6 +39,8 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
 
     // Fetch trending news
     _fetchTrendingNews();
+
+     _sendNotificationOnce();
   }
 
 
@@ -98,6 +100,38 @@ class _HomeUserState extends State<HomeUser> with SingleTickerProviderStateMixin
     trendingNews = fetchedNews;
   });
 }
+
+void _sendNotificationOnce() async {
+  final prefs = await SharedPreferences.getInstance();
+  bool hasNotified = prefs.getBool('has_notified') ?? false;
+
+  if (!hasNotified) {
+    await NotificationService.showNotification(
+        "Welcome!", "You have entered Home User.");
+
+    // Mark notification as sent
+    await prefs.setBool('has_notified', true);
+  }
+}
+
+  // void _sendNotificationOncePerDay() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   String today = DateTime.now().toString().split(' ')[0]; // Get today's date as "YYYY-MM-DD"
+
+  //   String? lastNotifiedDate = prefs.getString('last_notified_date');
+
+  //   if (lastNotifiedDate != today) {
+  //     // Send notification if it hasn't been sent today
+  //     await NotificationService.showNotification(
+  //       "Welcome!", "You have entered Home User today."
+  //     );
+
+  //     // Save today's date as the last notified date
+  //     await prefs.setString('last_notified_date', today);
+  //   }
+  // }
+
+
 
 
 
