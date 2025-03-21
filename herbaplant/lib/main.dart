@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const MainNavigation(),
+      builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
       path: '/login',
