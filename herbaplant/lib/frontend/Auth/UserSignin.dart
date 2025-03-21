@@ -144,9 +144,11 @@ class _UserSigninState extends State<UserSignin> {
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
+                              maxLength: 50,  // Limit to 50 characters
                               decoration: InputDecoration(
                                 prefixIcon: const Icon(Icons.email, color: Colors.green),
                                 labelText: 'Email',
+                                counterText: "", // Hides the character counter below the field
                                 enabledBorder: OutlineInputBorder(
                                   borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10),
@@ -163,40 +165,35 @@ class _UserSigninState extends State<UserSignin> {
                                 return null;
                               },
                             ),
+
                             const SizedBox(height: 12),
 
                             // Password Field
                             TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
+                              maxLength: 20,  // Limit to 20 characters
                               decoration: InputDecoration(
-                                prefixIcon:
-                                    const Icon(Icons.lock, color: Colors.green),
+                                prefixIcon: const Icon(Icons.lock, color: Colors.green),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
+                                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
                                     color: Colors.black,
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _obscurePassword =
-                                          !_obscurePassword;
+                                      _obscurePassword = !_obscurePassword;
                                     });
                                   },
                                 ),
                                 labelText: 'Password',
-                                labelStyle:
-                                    const TextStyle(color: Colors.black),
+                                counterText: "", // Hides the character counter below the field
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.black),
+                                  borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.black),
+                                  borderSide: const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
@@ -207,6 +204,7 @@ class _UserSigninState extends State<UserSignin> {
                                 return null;
                               },
                             ),
+
                             const SizedBox(height: 12),
 
                             // Forgot Password Button
