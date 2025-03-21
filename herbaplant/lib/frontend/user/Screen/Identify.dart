@@ -81,29 +81,7 @@ class _IdentifyState extends State<Identify> {
             align: ContentAlign.bottom,
             builder:  (context, controller) {
               return CoachMarkDesc( 
-                text: "Chat Box to communicate with the bot",
-                onNext: () {
-                  controller.next();
-                },
-                onSkip: () {
-                  controller.skip();
-                },
-              );
-            } 
-          ),
-        ]
-      ),
-
-      TargetFocus(
-        identify: "chat-key",
-        keyTarget: chatkey,
-        shape: ShapeLightFocus.RRect,
-        contents: [
-          TargetContent(
-            align: ContentAlign.top,
-            builder:  (context, controller) {
-              return CoachMarkDesc( 
-                text: "Chat with the bot to identify plants",
+                text: "Chat Box to display the identified plant details",
                 onNext: () {
                   controller.next();
                 },
@@ -119,12 +97,13 @@ class _IdentifyState extends State<Identify> {
       TargetFocus(
         identify: "camera-key",
         keyTarget: CameraKey,
+        shape: ShapeLightFocus.RRect,
         contents: [
           TargetContent(
             align: ContentAlign.top,
             builder:  (context, controller) {
               return CoachMarkDesc( 
-                text: "Click here to take a photo or Select of the plant you want to identify",
+                text: "Click here to take a photo or Select phot of the plant you want to identify",
                 onNext: () {
                   controller.next();
                 },
@@ -142,14 +121,6 @@ class _IdentifyState extends State<Identify> {
   
       
 // Tutorial Coach Mark /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // void _logout() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   await prefs.remove("token");
-  //   debugPrint("🔓 Token cleared.");
-  //   if (mounted) {
-  //     GoRouter.of(context).go('/login');
-  //   }
-  // }
 
   void _selectMedia(ImageSource source) async {
     XFile? pickedFile = await _picker.pickImage(source: source);
@@ -405,7 +376,7 @@ class _IdentifyState extends State<Identify> {
           ),
           // Chat input section
             Container(
-              key: chatkey,
+              key: CameraKey,
               color: Colors.white,
               padding: const EdgeInsets.all(16.0),
               child: Column(
