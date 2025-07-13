@@ -97,7 +97,7 @@ For any inquiries, please contact [kede.leones.up@phinmaed.com](kede.leones.up@p
 
 ## 📷 Screenshots
 
-> Add screenshots of the app here to showcase its functionality and design.
+to be implemen
 
 ---
 
